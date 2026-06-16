@@ -1,0 +1,8 @@
+{
+  "name": "JKK ETOILE",
+  "description": "Agence de voyage et d'import-export Kinshasa - Dubai",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
