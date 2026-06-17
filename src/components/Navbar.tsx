@@ -62,8 +62,8 @@ export default function Navbar() {
 
   const isHeroTransparent = location.pathname === '/' && !scrolled && !isOpen;
   const navClass = isHeroTransparent 
-    ? "bg-gradient-to-b from-navy/50 via-navy/20 to-transparent text-text" 
-    : "bg-navy/95 backdrop-blur-xl border-b border-gold/10 text-text shadow-sm";
+    ? "bg-navy/0 text-text border-b border-transparent" 
+    : "bg-navy/90 backdrop-blur-xl border-b border-gold/10 text-text shadow-sm";
   const logoColorClass = isHeroTransparent ? "text-text" : "text-gold";
 
   const changeLanguage = (langCode: string) => {
@@ -283,11 +283,11 @@ export default function Navbar() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, clipPath: "circle(0% at 100% 0)" }}
-            animate={{ opacity: 1, clipPath: "circle(150% at 100% 0)" }}
-            exit={{ opacity: 0, clipPath: "circle(0% at 100% 0)" }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="fixed inset-0 z-[90] bg-navy/95 backdrop-blur-xl flex flex-col pt-32 px-6 lg:hidden overflow-y-auto"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+            className="fixed inset-0 z-[90] bg-navy flex flex-col pt-32 px-6 lg:hidden overflow-y-auto"
           >
             <div className="flex flex-col gap-8 flex-grow max-w-sm mx-auto w-full">
               {dynamicNavItems.map((item, i) => (

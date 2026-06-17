@@ -1,12 +1,43 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Package, Users, ShoppingBag, Car, Plane, Search, Bell, Settings as SettingsIcon, LogOut, ChevronRight, BarChart3, Edit, Trash2, CheckCircle, CheckCircle2, Clock, Truck, XCircle, UploadCloud, X, Image as ImageIcon, Home as HomeIcon, ArrowDownCircle, Megaphone, Star, RefreshCcw, CreditCard, MessageCircle, Pencil, Mail, FileText, Building2, Plus, Save } from 'lucide-react';
 import { motion, AnimatePresence } from "motion/react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSiteConfig, AnnouncementItem } from "../components/SiteContext";
+import { auth, signInWithGoogle, logout } from "../firebase";
+import { onAuthStateChanged } from "firebase/auth";
 
 export default function Admin() {
   const { config, updateConfig } = useSiteConfig();
   const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
+  const [adminUser, setAdminUser] = useState<any>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setAdminUser(user);
+      if (user && user.email && config.admins && config.admins.includes(user.email)) {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
+      setIsAuthChecking(false);
+    });
+    return () => unsubscribe();
+  }, [config.admins]);
+
+  const handleAdminLogin = async () => {
+    try {
+      const user = await signInWithGoogle();
+      if (!user?.email || !config.admins?.includes(user.email)) {
+        alert("Accès non autorisé. Vous n'êtes pas administrateur.");
+        logout();
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  };
+
   const [activeTab, setActiveTab] = useState("dashboard");
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [showArchived, setShowArchived] = useState(false);
@@ -627,6 +658,53 @@ const getPendingCount = (id: string, config: any) => {
     { id: "mobilemoney", label: "Mobile Money", icon: CreditCard },
     { id: "settings", label: "Paramètres", icon: SettingsIcon },
   ];
+
+  if (isAuthChecking) {
+    return (
+      <div className="flex h-screen bg-navy text-text items-center justify-center pt-24">
+        <div className="text-gold uppercase tracking-widest animate-pulse font-light">Vérification de l'accès...</div>
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="flex flex-col h-screen bg-navy text-text items-center justify-center p-4 pt-24">
+        <h1 className="text-2xl font-display mb-2 text-center text-gold">Accès Restreint</h1>
+        <p className="text-text/70 mb-8 max-w-md text-center text-sm">
+          Cet espace est réservé aux administrateurs de JKK Etoile. 
+          {adminUser?.email && (
+            <span className="block mt-2 text-gold-muted font-medium">
+              Connecté en tant que: {adminUser.email}
+            </span>
+          )}
+        </p>
+        {!adminUser ? (
+          <button 
+            onClick={handleAdminLogin}
+            className="bg-gold text-navy px-8 py-3 rounded text-sm uppercase tracking-wider font-semibold hover:bg-[#d4b069] transition-colors"
+          >
+            Se connecter avec Google
+          </button>
+        ) : (
+          <div className="flex gap-4">
+             <button 
+              onClick={handleAdminLogin}
+              className="bg-text/10 text-text px-6 py-2 rounded text-xs uppercase tracking-wider font-semibold hover:bg-text/20 transition-colors"
+            >
+              Changer de compte
+            </button>
+            <button 
+              onClick={() => logout()}
+              className="bg-red-500/10 text-red-400 px-6 py-2 rounded text-xs uppercase tracking-wider font-semibold hover:bg-red-500 hover:text-white transition-colors"
+            >
+              Se déconnecter
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-navy text-text pt-0">
@@ -2301,7 +2379,32 @@ const getPendingCount = (id: string, config: any) => {
               </div>
             </motion.div>
 
-            
+            <motion.div
+              variants={{
+                hidden: { opacity: 0, scale: 0.98 },
+                show: { opacity: 1, scale: 1 },
+              }}
+              className="bg-glass border border-gold-muted/20 p-6 rounded-lg space-y-6"
+            >
+               <h3 className="text-lg font-display text-gold">
+                Administrateurs (Emails)
+              </h3>
+              <p className="text-xs text-text/60">Séparez les emails par des virgules pour ajouter plusieurs administrateurs.</p>
+              <div className="grid grid-cols-1 gap-6">
+                <div>
+                   <input
+                    type="text"
+                    value={config.admins?.join(', ') || ''}
+                    onChange={(e) => {
+                       const emails = e.target.value.split(',').map(email => email.trim()).filter(Boolean);
+                       updateConfig({ admins: emails.length > 0 ? emails : ['mushitujacques3@gmail.com'] });
+                    }}
+                    placeholder="email@example.com, autre@example.com"
+                    className="w-full bg-navy border border-text/20 p-3 rounded text-sm text-text focus:outline-none focus:border-gold"
+                  />
+                </div>
+              </div>
+            </motion.div>
 
             <div className="flex justify-end pt-4">
               <button

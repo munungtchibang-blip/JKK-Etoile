@@ -66,9 +66,9 @@ export default function Dashboard() {
         localStorage.setItem('jkk_is_logged_in', 'true');
         setIsLoggedIn(true);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erreur de connexion", error);
-      alert("Une erreur est survenue lors de la connexion.");
+      alert(`Erreur Google Auth: ${error?.message || "Veuillez réessayer ou autoriser les popups."}`);
     }
   };
 

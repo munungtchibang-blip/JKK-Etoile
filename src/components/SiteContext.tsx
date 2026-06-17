@@ -146,6 +146,7 @@ export interface SiteConfig {
   shopTitle?: string;
   shopDescription?: string;
   adminProfileImage?: string;
+  admins?: string[];
 }
 
 const defaultServices: ServiceItem[] = [
@@ -265,7 +266,8 @@ const defaultConfig: SiteConfig = {
   products: PRODUCTS as any[], // use original if loaded
   cars: CARS as CarItem[],
   messages: [],
-    reviews: [],
+  admins: ['mushitujacques3@gmail.com'],
+  reviews: [],
   visaTypes: defaultVisaTypes,
   shopCoverImage: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?auto=format&fit=crop&q=80&w=2070',
   shopTitle: 'Boutique Express',
@@ -334,6 +336,7 @@ export function SiteProvider({ children }: { children: ReactNode }) {
           products: parsed.products && parsed.products.length > 0 ? parsed.products : defaultConfig.products,
           cars: parsed.cars && parsed.cars.length > 0 ? parsed.cars : defaultConfig.cars,
           messages: parsed.messages || defaultConfig.messages,
+          admins: parsed.admins || defaultConfig.admins,
           visaTypes: parsed.visaTypes && parsed.visaTypes.length > 0 ? parsed.visaTypes : defaultConfig.visaTypes
         };
       } catch (e) {
