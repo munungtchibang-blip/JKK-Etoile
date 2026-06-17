@@ -128,7 +128,7 @@ export default function Home() {
         <div className="absolute inset-0 z-0 bg-gradient-to-b from-navy/50 via-transparent to-navy/10"></div>
         <div className="absolute inset-0 z-0 bg-gradient-to-t from-navy via-navy/80 to-transparent"></div>
         
-        <div className="relative z-10 w-full max-w-4xl mx-auto px-4 pt-[280px] pb-32 sm:px-6 lg:px-8 flex flex-col items-center text-center">
+        <div className="relative z-10 w-full max-w-4xl mx-auto px-4 pt-[180px] sm:pt-[280px] pb-32 sm:px-6 lg:px-8 flex flex-col items-center text-center">
             <motion.span 
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
