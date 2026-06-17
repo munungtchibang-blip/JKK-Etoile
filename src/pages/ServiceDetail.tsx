@@ -112,7 +112,7 @@ export default function ServiceDetail() {
                  Nous Contacter
                  <ArrowRight size={16} />
                </Link>
-               <a href={`https://wa.me/${config.contactWhatsapp.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center border border-gold/50 text-gold shadow-sm px-8 py-3.5 text-xs tracking-[2px] uppercase font-bold transition-all hover:bg-gold/10 hover:border-gold rounded-full">
+               <a href={`https://wa.me/${String(config.contactWhatsapp || '').replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center border border-gold/50 text-gold shadow-sm px-8 py-3.5 text-xs tracking-[2px] uppercase font-bold transition-all hover:bg-gold/10 hover:border-gold rounded-full">
                  WhatsApp
                </a>
             </div>

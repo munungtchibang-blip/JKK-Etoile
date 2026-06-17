@@ -39,7 +39,7 @@ export default function CargoService() {
 
   const handleWhatsapp = () => {
     const message = `Bonjour, je souhaite avoir plus de détails concernant le fret et la logistique.`;
-    const num = config.contactWhatsapp.replace(/[^0-9]/g, '');
+    const num = String(config.contactWhatsapp || '').replace(/[^0-9]/g, '');
     window.open(`https://wa.me/${num}?text=${encodeURIComponent(message)}`, '_blank');
   };
 

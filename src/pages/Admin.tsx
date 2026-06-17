@@ -10,6 +10,7 @@ export default function Admin() {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [showArchived, setShowArchived] = useState(false);
+  const [selectedClientName, setSelectedClientName] = useState<string | null>(null);
   const finalStatuses = ['Validé', 'Approuvé', 'Livré', 'Terminé', 'Expédiée', 'Expédiées', 'Complété', 'Annulé'];
   const isArchived = (s: string) => finalStatuses.includes(s);
   const [expandedTransferId, setExpandedTransferId] = useState<string | null>(null);
@@ -83,9 +84,9 @@ export default function Admin() {
   const sortedOrders = [...orders].filter(o => showArchived || !finalStatusesList.includes(o.status)).sort((a, b) => {
     if (orderSort.startsWith("date")) {
       const dateVal = (d: string) => d === "Aujourd'hui" ? 2 : d === "Hier" ? 1 : 0;
-      return orderSort === "date_desc" ? dateVal(b.date) - dateVal(a.date) : dateVal(a.date) - dateVal(b.date);
+      return orderSort === "date_desc" ? dateVal(b.date || "") - dateVal(a.date || "") : dateVal(a.date || "") - dateVal(b.date || "");
     } else {
-      return orderSort === "client_asc" ? a.client.localeCompare(b.client) : b.client.localeCompare(a.client);
+      return orderSort === "client_asc" ? String(a.client || "").localeCompare(String(b.client || "")) : String(b.client || "").localeCompare(String(a.client || ""));
     }
   });
 
@@ -807,7 +808,7 @@ const getPendingCount = (id: string, config: any) => {
                                    </div>
                                    <div className="flex gap-3 mt-4">
                                      {order.phone && (
-                                       <a href={`https://wa.me/${order.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="flex-1 flex justify-center py-2 bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500 hover:text-white rounded text-[11px] uppercase tracking-wider font-semibold transition-colors">
+                                       <a href={`https://wa.me/${String(order.phone || '').replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="flex-1 flex justify-center py-2 bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500 hover:text-white rounded text-[11px] uppercase tracking-wider font-semibold transition-colors">
                                          WhatsApp
                                        </a>
                                      )}
@@ -912,7 +913,7 @@ const getPendingCount = (id: string, config: any) => {
                                 />
                                 <div className="flex justify-end gap-2 mt-2">
     {transfer.phone && (
-      <a href={`https://wa.me/${transfer.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(transfer.adminReply || "Bonjour concernant votre transfert")}`} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="px-3 py-1 bg-green-500/20 text-green-400 border border-green-500/30 text-[10px] uppercase font-bold tracking-wider rounded hover:bg-green-500 hover:text-white transition-colors flex items-center gap-1">WhatsApp</a>
+      <a href={`https://wa.me/${String(transfer.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(transfer.adminReply || "Bonjour concernant votre transfert")}`} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="px-3 py-1 bg-green-500/20 text-green-400 border border-green-500/30 text-[10px] uppercase font-bold tracking-wider rounded hover:bg-green-500 hover:text-white transition-colors flex items-center gap-1">WhatsApp</a>
     )}
     <button
       onClick={(e) => {
@@ -1781,7 +1782,7 @@ const getPendingCount = (id: string, config: any) => {
                             <div className="flex items-center justify-end gap-2">
                               {msg.phone && (
                                 <a
-                                  href={`https://wa.me/${msg.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Bonjour ${msg.name}, suite à votre message : "${msg.subject}"`)}`}
+                                  href={`https://wa.me/${String(msg.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Bonjour ${msg.name}, suite à votre message : "${msg.subject}"`)}`}
                                   target="_blank"
                                   rel="noopener noreferrer"
                                   className="p-2 text-text/50 hover:text-[#25D366] transition-colors"
@@ -1839,7 +1840,7 @@ const getPendingCount = (id: string, config: any) => {
               <div className="mt-8 pt-6 border-t border-white/10 flex justify-end gap-4">
                 {selectedMessage.phone && (
                   <a
-                    href={`https://wa.me/${selectedMessage.phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Bonjour ${selectedMessage.name}, suite à votre message : "${selectedMessage.subject}"`)}`}
+                    href={`https://wa.me/${String(selectedMessage.phone || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Bonjour ${selectedMessage.name}, suite à votre message : "${selectedMessage.subject}"`)}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="px-6 py-2 bg-[#25D366]/10 text-[#25D366] hover:bg-[#25D366]/20 transition-colors uppercase tracking-widest text-[10px] rounded font-bold"
@@ -2419,7 +2420,7 @@ const getPendingCount = (id: string, config: any) => {
                                    </div>
                                    <div className="flex gap-3 mt-4">
                                      {order.phone && (
-                                       <a href={`https://wa.me/${order.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="flex-1 flex justify-center py-2 bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500 hover:text-white rounded text-[11px] uppercase tracking-wider font-semibold transition-colors">
+                                       <a href={`https://wa.me/${String(order.phone || '').replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="flex-1 flex justify-center py-2 bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500 hover:text-white rounded text-[11px] uppercase tracking-wider font-semibold transition-colors">
                                          WhatsApp
                                        </a>
                                      )}
@@ -2526,7 +2527,7 @@ const getPendingCount = (id: string, config: any) => {
                                    </div>
                                    <div className="flex gap-3 mt-4">
                                      {order.phone && (
-                                       <a href={`https://wa.me/${order.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="flex-1 flex justify-center py-2 bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500 hover:text-white rounded text-[11px] uppercase tracking-wider font-semibold transition-colors">
+                                       <a href={`https://wa.me/${String(order.phone || '').replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="flex-1 flex justify-center py-2 bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500 hover:text-white rounded text-[11px] uppercase tracking-wider font-semibold transition-colors">
                                          WhatsApp
                                        </a>
                                      )}
@@ -2633,7 +2634,7 @@ const getPendingCount = (id: string, config: any) => {
                                    </div>
                                    <div className="flex gap-3 mt-4">
                                      {order.phone && (
-                                       <a href={`https://wa.me/${order.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="flex-1 flex justify-center py-2 bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500 hover:text-white rounded text-[11px] uppercase tracking-wider font-semibold transition-colors">
+                                       <a href={`https://wa.me/${String(order.phone || '').replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="flex-1 flex justify-center py-2 bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500 hover:text-white rounded text-[11px] uppercase tracking-wider font-semibold transition-colors">
                                          WhatsApp
                                        </a>
                                      )}
@@ -2740,7 +2741,7 @@ const getPendingCount = (id: string, config: any) => {
                                    </div>
                                    <div className="flex gap-3 mt-4">
                                      {order.phone && (
-                                       <a href={`https://wa.me/${order.phone.replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="flex-1 flex justify-center py-2 bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500 hover:text-white rounded text-[11px] uppercase tracking-wider font-semibold transition-colors">
+                                       <a href={`https://wa.me/${String(order.phone || '').replace(/[^0-9]/g, '')}`} target="_blank" rel="noreferrer" onClick={(e) => e.stopPropagation()} className="flex-1 flex justify-center py-2 bg-green-500/10 text-green-400 border border-green-500/20 hover:bg-green-500 hover:text-white rounded text-[11px] uppercase tracking-wider font-semibold transition-colors">
                                          WhatsApp
                                        </a>
                                      )}

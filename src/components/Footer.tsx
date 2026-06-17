@@ -53,7 +53,7 @@ export default function Footer() {
                 </a>
               )}
               {config.contactWhatsapp && (
-                <a href={`https://wa.me/${config.contactWhatsapp.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-text/90 font-medium hover:text-gold transition-colors">
+                <a href={`https://wa.me/${String(config.contactWhatsapp || '').replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-text/90 font-medium hover:text-gold transition-colors">
                   <MessageCircle size={20} />
                 </a>
               )}

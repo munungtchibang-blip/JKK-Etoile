@@ -163,7 +163,7 @@ export default function Shop() {
             )}
           </button>
           <a
-            href={`https://wa.me/${config.contactWhatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Bonjour, je souhaite avoir plus de détails concernant la boutique.')}`}
+            href={`https://wa.me/${String(config.contactWhatsapp || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Bonjour, je souhaite avoir plus de détails concernant la boutique.')}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex-1 md:flex-none flex items-center justify-center gap-2 border border-gold/50 bg-transparent px-6 py-3 text-xs tracking-widest uppercase font-semibold text-gold hover:bg-gold/10 transition-colors"
@@ -637,7 +637,7 @@ export default function Shop() {
                         })
                         .join("\n\n");
                       const message = `Bonjour, je souhaite passer commande pour les articles suivants:\n\n${itemsText}\n\nTotal: ${total}$`;
-                      const num = config.contactWhatsapp.replace(/[^0-9]/g, "");
+                      const num = String(config.contactWhatsapp || '').replace(/[^0-9]/g, "");
                       window.open(
                         `https://wa.me/${num}?text=${encodeURIComponent(message)}`,
                         "_blank",

@@ -469,7 +469,7 @@ export default function Cars() {
                 <div className="flex flex-col items-stretch gap-2 mb-2">
                   <div className="flex items-center justify-between gap-2">
                     <a 
-                      href={`https://wa.me/${config.contactWhatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Bonjour, je suis intéressé par ce véhicule : ${car.brand} ${car.model} (${car.year}) à ${car.priceStr}.`)}`}
+                      href={`https://wa.me/${String(config.contactWhatsapp || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Bonjour, je suis intéressé par ce véhicule : ${car.brand} ${car.model} (${car.year}) à ${car.priceStr}.`)}`}
                       target="_blank" rel="noopener noreferrer"
                       className="flex-1 flex items-center justify-center gap-2 bg-transparent text-text/90 font-medium border border-text/20 px-2 py-2 text-[10px] sm:text-[11px] uppercase tracking-wider transition-all hover:bg-white/10 hover:text-text outline-none focus:ring-1 focus:ring-white/50 active:scale-95"
                     >
@@ -579,7 +579,7 @@ export default function Cars() {
           <button className="bg-gold px-8 py-4 text-xs tracking-widest uppercase font-semibold text-[#0f172a] hover:bg-[#d4b069] transition-colors focus:ring-2 focus:ring-offset-2 focus:ring-offset-navy-800 focus:ring-gold w-full sm:w-auto">
             Faire une demande sur mesure
           </button>
-          <a href={`https://wa.me/${config.contactWhatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Bonjour, je souhaite avoir plus de détails concernant les véhicules.')}`} target="_blank" rel="noopener noreferrer" className="bg-transparent border border-gold/50 text-gold px-8 py-4 text-xs tracking-widest uppercase font-semibold hover:bg-gold/10 transition-all w-full sm:w-auto flex items-center justify-center gap-2 active:scale-95">
+          <a href={`https://wa.me/${String(config.contactWhatsapp || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Bonjour, je souhaite avoir plus de détails concernant les véhicules.')}`} target="_blank" rel="noopener noreferrer" className="bg-transparent border border-gold/50 text-gold px-8 py-4 text-xs tracking-widest uppercase font-semibold hover:bg-gold/10 transition-all w-full sm:w-auto flex items-center justify-center gap-2 active:scale-95">
             Continuer la discussion sur WhatsApp
           </a>
         </div>
@@ -728,7 +728,7 @@ export default function Cars() {
                         <Package size={16} /> Au Panier
                       </button>
                       <a 
-                        href={`https://wa.me/${config.contactWhatsapp.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Bonjour, je souhaite avoir plus d'informations concernant ce véhicule : ${car.brand} ${car.model} (${car.year}) à ${car.priceStr}.`)}`}
+                        href={`https://wa.me/${String(config.contactWhatsapp || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Bonjour, je souhaite avoir plus d'informations concernant ce véhicule : ${car.brand} ${car.model} (${car.year}) à ${car.priceStr}.`)}`}
                         target="_blank" 
                         rel="noopener noreferrer" 
                         className="w-full sm:flex-1 bg-[#25D366] text-[#0f172a] px-4 py-3 text-xs uppercase tracking-[2px] flex items-center justify-center gap-2 transition-all hover:bg-[#20b858] font-bold rounded shadow-md"
@@ -843,7 +843,7 @@ export default function Cars() {
                 <div className="p-6 border-t border-gold/10 bg-navy-800/50">
                   <button 
                     onClick={() => {
-                      const num = config.contactWhatsapp.replace(/[^0-9]/g, '');
+                      const num = String(config.contactWhatsapp || '').replace(/[^0-9]/g, '');
                       const itemsText = cart.map((c) => `- ${c.brand} ${c.model} (${c.priceStr})`).join("\\n");
                       const message = `Bonjour, je souhaite passer commande pour les véhicules suivants:\\n\\n${itemsText}`;
                       window.open(`https://wa.me/${num}?text=${encodeURIComponent(message)}`, '_blank');

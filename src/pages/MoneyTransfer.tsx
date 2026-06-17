@@ -50,7 +50,7 @@ export default function MoneyTransfer() {
       });
       
       const message = `Bonjour, je viens de faire une demande de transfert (Ref: ${transactionRef}).`;
-      const num = config.contactWhatsapp.replace(/[^0-9]/g, '');
+      const num = String(config.contactWhatsapp || '').replace(/[^0-9]/g, '');
       
       setVerifying(false);
       setSubmitted(true);
@@ -61,7 +61,7 @@ export default function MoneyTransfer() {
 
   const handleWhatsapp = () => {
     const message = `Bonjour, je souhaite avoir plus de détails concernant les transferts d'argent.`;
-    const num = config.contactWhatsapp.replace(/[^0-9]/g, '');
+    const num = String(config.contactWhatsapp || '').replace(/[^0-9]/g, '');
     window.open(`https://wa.me/${num}?text=${encodeURIComponent(message)}`, '_blank');
   };
 

@@ -144,7 +144,7 @@ export default function Flights() {
     setSubmitted(true);
     
     const message = `Bonjour, je souhaite réserver un vol de Kinshasa à Dubai pour le ${date} (${passengers} passager(s)). Nom: ${name}, Télephone: ${phone}`;
-    const num = config.contactWhatsapp.replace(/[^0-9]/g, '');
+    const num = String(config.contactWhatsapp || '').replace(/[^0-9]/g, '');
     window.open(`https://wa.me/${num}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -152,7 +152,7 @@ export default function Flights() {
 
   const handleWhatsappForm = () => {
     const message = `Bonjour, je souhaite avoir plus de détails concernant les billets d'avion.`;
-    const num = config.contactWhatsapp.replace(/[^0-9]/g, '');
+    const num = String(config.contactWhatsapp || '').replace(/[^0-9]/g, '');
     window.open(`https://wa.me/${num}?text=${encodeURIComponent(message)}`, '_blank');
   };
 

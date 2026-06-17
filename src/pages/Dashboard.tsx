@@ -178,7 +178,7 @@ export default function Dashboard() {
               </div>
               <div className="divide-y divide-gold-muted/30">
                 {config.orders && config.orders.length > 0 ? (
-                  config.orders.filter(o => o.client.includes(userName.split(' ')[0]) || true).slice(0, 5).map(order => (
+                  config.orders.filter(o => String(o.client || '').includes(userName.split(' ')[0]) || true).slice(0, 5).map(order => (
                     <div key={order.id} className="p-6 flex flex-col gap-4 hover:bg-white/5 transition-colors">
                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div>
@@ -221,7 +221,7 @@ export default function Dashboard() {
               </div>
               <div className="divide-y divide-gold-muted/30">
                 {config.transfers && config.transfers.length > 0 ? (
-                  config.transfers.filter(t => t.client.includes(userName.split(' ')[0]) || true).map(transfer => (
+                  config.transfers.filter(t => String(t.client || '').includes(userName.split(' ')[0]) || true).map(transfer => (
                     <div key={transfer.id} className="p-6 flex flex-col gap-4 hover:bg-white/5 transition-colors">
                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div>

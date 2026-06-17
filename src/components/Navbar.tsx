@@ -50,9 +50,9 @@ export default function Navbar() {
       return {
         ...item,
         subMenu: [
-          ...(config.services || []).map(s => ({
-            label: s.title,
-            href: s.link || '#',
+          ...(config.services || []).map((s: any) => ({
+            label: s.title || s.name || s.type || 'Service',
+            href: s.link || (s.id ? `/services/${s.id}` : '#'),
           }))
         ]
       };

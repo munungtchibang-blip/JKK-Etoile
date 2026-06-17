@@ -201,7 +201,7 @@ export default function ProductDetails() {
 
                     const imageUrl = new URL(product.image, window.location.origin).href;
                     const message = `Bonjour, je souhaite passer commande pour le produit: ${product.name} (${product.price}$).\n\nImage : ${imageUrl}`;
-                    const num = config.contactWhatsapp.replace(/[^0-9]/g, '');
+                    const num = String(config.contactWhatsapp || '').replace(/[^0-9]/g, '');
                     window.open(`https://wa.me/${num}?text=${encodeURIComponent(message)}`, '_blank');
                  }}
                  className="flex-1 bg-gold text-[#0f172a] px-8 py-4 text-xs font-bold uppercase tracking-widest hover:bg-[#c4a059] transition-all focus:outline-none flex items-center justify-center gap-2 rounded-lg shadow-lg hover:shadow-gold/20 active:scale-95"
