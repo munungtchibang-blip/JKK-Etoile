@@ -9,6 +9,15 @@
   --theme-glass: rgba(30, 41, 59, 0.85);
   --theme-border: rgba(212, 176, 105, 0.3);
   --theme-gold: #d4b069;
+
+  --color-navy: var(--theme-bg);
+  --color-navy-800: var(--theme-bg-alt);
+  --color-gold: var(--theme-gold);
+  --color-gold-muted: var(--theme-border);
+  --color-glass: var(--theme-glass);
+  --color-text: var(--theme-text);
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Playfair Display", ui-serif, Georgia, serif;
 }
 
 :root.light {
