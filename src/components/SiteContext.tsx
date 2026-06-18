@@ -2,6 +2,8 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { LucideIcon } from 'lucide-react';
 import { PRODUCTS } from '../data/products';
 import { CARS } from '../data/cars';
+import { db } from '../firebase';
+import { doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
 
 export interface ServiceItem {
   id: string;
@@ -288,7 +290,6 @@ export function SiteProvider({ children }: { children: ReactNode }) {
       try {
         const parsed = JSON.parse(saved);
         
-        // Merge missing fields like imageUrl for default services if they don't have them
         let mergedServices = (parsed.services || defaultConfig.services).map((svc: ServiceItem) => {
           if (!svc.imageUrl) {
             const defaultSvc = defaultConfig.services.find(s => s.id === svc.id);
@@ -299,7 +300,6 @@ export function SiteProvider({ children }: { children: ReactNode }) {
           return svc;
         });
 
-        // Force Restore Boutique Express if missing
         const cargo = defaultConfig.services.find(s => s.id === '9');
         if (cargo && !mergedServices.some((s: ServiceItem) => s.id === '9' || s.title.includes('Cargo') || s.title.includes('Service cargo'))) {
           mergedServices = [...mergedServices, cargo].sort((a,b) => Number(a.id) - Number(b.id));
@@ -312,7 +312,6 @@ export function SiteProvider({ children }: { children: ReactNode }) {
           }
         }
 
-        // Force correction: Cargo -> Service cargo
         mergedServices = mergedServices.map(s => {
           if (s.id === '9' || s.title.toLowerCase() === 'cargo') {
              return { ...s, title: "Service cargo" };
@@ -347,11 +346,41 @@ export function SiteProvider({ children }: { children: ReactNode }) {
   });
 
   useEffect(() => {
-    localStorage.setItem('siteConfig', JSON.stringify(config));
-  }, [config]);
+    const docRef = doc(db, 'settings', 'global');
+    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+      if (docSnap.exists()) {
+        const firestoreConfig = docSnap.data() as SiteConfig;
+        
+        // Ensure admins are merged properly if missing
+        const mergedAdmins = firestoreConfig.admins?.length ? firestoreConfig.admins : ['mushitujacques3@gmail.com'];
+        const finalConfig = { ...firestoreConfig, admins: mergedAdmins };
+        
+        setConfig(finalConfig);
+        localStorage.setItem('siteConfig', JSON.stringify(finalConfig));
+      } else {
+        // Only initialize it from local storage if the user explicitly has stored data that is not perfectly matching default
+        const saved = localStorage.getItem('siteConfig');
+        if (saved) {
+           setDoc(docRef, config).catch(console.error);
+        }
+      }
+    }, (error) => {
+      console.error("Firestore snapshot error:", error);
+    });
 
-  const updateConfig = (newConfig: Partial<SiteConfig>) => {
-    setConfig((prev) => ({ ...prev, ...newConfig }));
+    return () => unsubscribe();
+  }, []);
+
+  const updateConfig = async (newConfig: Partial<SiteConfig>) => {
+    const updated = { ...config, ...newConfig };
+    setConfig(updated);
+    
+    try {
+      const docRef = doc(db, 'settings', 'global');
+      await setDoc(docRef, updated, { merge: true });
+    } catch (e) {
+      console.error("Error updating config in firestore", e);
+    }
   };
 
   return (

@@ -1,5 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, GoogleAuthProvider, signInWithPopup, browserPopupRedirectResolver, signInWithRedirect, getRedirectResult, signOut } from "firebase/auth";
+import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCOpdGBB3aUje04RFQEPybyrzfOcA2HZmg",
@@ -12,6 +13,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
+export const db = getFirestore(app, "ai-studio-1fc32c9e-0459-4336-9314-eb28e4f83a41");
 export const googleProvider = new GoogleAuthProvider();
 
 export const signInWithGoogle = async () => {

@@ -1,0 +1,23 @@
+{
+  "collections": [
+    {
+      "collection_id": "settings",
+      "description": "Global settings",
+      "rules": [
+        {
+          "match": "global",
+          "operations": [
+            {
+              "type": "read",
+              "condition": "true"
+            },
+            {
+              "type": "write",
+              "condition": "request.auth != null"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

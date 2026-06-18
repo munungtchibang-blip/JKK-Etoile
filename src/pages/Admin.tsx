@@ -708,7 +708,7 @@ const getPendingCount = (id: string, config: any) => {
   }
 
   return (
-    <div className="flex h-screen bg-navy text-text pt-0">
+    <div className="flex h-[100dvh] bg-navy text-text pt-0 overflow-hidden">
       {/* Mobile Header */}
       <div className="md:hidden fixed top-0 w-full z-30 bg-navy-800 border-b border-gold-muted/20 px-4 py-3 flex items-center justify-between">
         <h2 className="text-xl font-display tracking-wide">Gestion JKK</h2>
@@ -729,7 +729,7 @@ const getPendingCount = (id: string, config: any) => {
       )}
 
       {/* Sidebar */}
-      <aside className={`w-64 bg-navy-800 border-r border-gold-muted/20 flex flex-col h-screen fixed z-40 top-0 transition-transform duration-300 md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <aside className={`w-64 bg-navy-800 border-r border-gold-muted/20 flex flex-col h-[100dvh] fixed z-40 top-0 transition-transform duration-300 md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <div className="p-6 border-b border-gold-muted/20 flex justify-between items-center">
           <div>
             <span className="text-[10px] uppercase tracking-[3px] text-gold block mb-2">
@@ -874,8 +874,7 @@ const getPendingCount = (id: string, config: any) => {
                  Afficher l'historique et les traitées
                </label>
              </div>
-             <div className="bg-glass border border-gold-muted/20 rounded-lg overflow-hidden shadow-lg">
-               <table className="w-full text-left border-collapse whitespace-nowrap">
+             <div className="bg-glass border border-gold-muted/20 rounded-lg overflow-hidden shadow-lg"><div className="overflow-x-auto"><table className="w-full text-left border-collapse whitespace-nowrap">
                  <thead>
                    <tr className="bg-navy-800 border-b border-gold/30 text-[10px] uppercase text-gold font-bold">
                      <th className="p-4">ID</th><th className="p-4">Client</th><th className="p-4">Statut</th><th className="p-4 text-right">Actions</th>
@@ -935,9 +934,7 @@ const getPendingCount = (id: string, config: any) => {
                      </React.Fragment>
                    ))}
                  </tbody>
-               </table>
-             </div>
-           </motion.div>
+               </table></div>            </div>          </motion.div>
         )}
 
         {activeTab === "transfers" && (
@@ -946,8 +943,7 @@ const getPendingCount = (id: string, config: any) => {
                <h2 className="text-2xl font-display">Gestion des Transferts</h2>
               
              </div>
-             <div className="bg-glass border border-gold-muted/20 rounded-lg overflow-hidden shadow-lg">
-               <table className="w-full text-left border-collapse whitespace-nowrap">
+             <div className="bg-glass border border-gold-muted/20 rounded-lg overflow-hidden shadow-lg"><div className="overflow-x-auto"><table className="w-full text-left border-collapse whitespace-nowrap">
                  <thead>
                    <tr className="bg-navy-800 border-b border-gold/30 text-[10px] uppercase text-gold font-bold">
                      <th className="p-4">ID</th><th className="p-4">Client</th><th className="p-4">Montant</th><th className="p-4">Statut</th><th className="p-4 text-right">Actions</th>
@@ -1049,9 +1045,7 @@ const getPendingCount = (id: string, config: any) => {
                      </tr>
                   )}
                 </tbody>
-              </table>
-            </div>
-          </motion.div>
+              </table></div>            </div>          </motion.div>
         )}
 
         {activeTab === "shop" && (
@@ -1205,8 +1199,7 @@ const getPendingCount = (id: string, config: any) => {
               </div>
             )}
 
-            <div className="bg-glass border border-gold-muted/20 rounded-lg overflow-hidden">
-              <table className="w-full text-left border-collapse whitespace-nowrap">
+            <div className="bg-glass border border-gold-muted/20 rounded-lg overflow-hidden"><div className="overflow-x-auto"><table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
                   <tr className="bg-navy border-b border-gold-muted/30 text-[10px] uppercase tracking-widest text-text/60 font-bold">
                     <th className="p-4">Type</th>
@@ -1267,9 +1260,7 @@ const getPendingCount = (id: string, config: any) => {
                     );
                   })}
                 </tbody>
-              </table>
-            </div>
-          </motion.div>
+              </table></div>            </div>          </motion.div>
         )}
 
         {activeTab === "cars" && (
@@ -1395,8 +1386,7 @@ const getPendingCount = (id: string, config: any) => {
               </div>
             )}
 
-            <div className="bg-glass border border-gold-muted/20 rounded-lg overflow-hidden">
-              <table className="w-full text-left border-collapse whitespace-nowrap">
+            <div className="bg-glass border border-gold-muted/20 rounded-lg overflow-hidden"><div className="overflow-x-auto"><table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
                   <tr className="bg-navy-800 border-b border-gold/30 text-[10px] uppercase tracking-widest text-gold font-bold">
                     <th className="p-4">Modèle</th>
@@ -1444,9 +1434,7 @@ const getPendingCount = (id: string, config: any) => {
                     </tr>
                   ))}
                 </tbody>
-              </table>
-            </div>
-          </motion.div>
+              </table></div>            </div>          </motion.div>
         )}
 
         {activeTab === "flights" && (
@@ -1526,8 +1514,7 @@ const getPendingCount = (id: string, config: any) => {
               </div>
             )}
 
-            <div className="bg-glass border border-gold-muted/20 rounded-lg overflow-hidden">
-              <table className="w-full text-left border-collapse whitespace-nowrap">
+            <div className="bg-glass border border-gold-muted/20 rounded-lg overflow-hidden"><div className="overflow-x-auto"><table className="w-full text-left border-collapse whitespace-nowrap">
                 <thead>
                   <tr className="bg-navy border-b border-gold-muted/30 text-[10px] uppercase tracking-widest text-text/60 font-bold">
                     <th className="p-4">Type</th>
@@ -1569,9 +1556,7 @@ const getPendingCount = (id: string, config: any) => {
                     </tr>
                   ))}
                 </tbody>
-              </table>
-            </div>
-          </motion.div>
+              </table></div>            </div>          </motion.div>
         )}
 
         {activeTab === "announcements" && (
@@ -2516,8 +2501,7 @@ const getPendingCount = (id: string, config: any) => {
                  Anciennes et traitées
                </label>
             </div>
-            <div className="bg-glass border border-gold-muted/20 rounded-lg overflow-hidden shadow-lg">
-               <table className="w-full text-left border-collapse whitespace-nowrap">
+            <div className="bg-glass border border-gold-muted/20 rounded-lg overflow-hidden shadow-lg"><div className="overflow-x-auto"><table className="w-full text-left border-collapse whitespace-nowrap">
                  <thead>
                    <tr className="bg-navy-800 border-b border-gold/30 text-[10px] uppercase text-gold font-bold">
                      <th className="p-4">ID</th><th className="p-4">Client</th><th className="p-4">Visa</th><th className="p-4">Statut</th>
@@ -2572,9 +2556,7 @@ const getPendingCount = (id: string, config: any) => {
    </React.Fragment>
                    ))}
                  </tbody>
-               </table>
-            </div>
-          </motion.div>
+               </table></div>            </div>          </motion.div>
         )}
 
 
@@ -2623,8 +2605,7 @@ const getPendingCount = (id: string, config: any) => {
                  Anciennes et traitées
                </label>
             </div>
-            <div className="bg-glass border border-gold-muted/20 rounded-lg overflow-hidden shadow-lg">
-               <table className="w-full text-left border-collapse whitespace-nowrap">
+            <div className="bg-glass border border-gold-muted/20 rounded-lg overflow-hidden shadow-lg"><div className="overflow-x-auto"><table className="w-full text-left border-collapse whitespace-nowrap">
                  <thead>
                    <tr className="bg-navy-800 border-b border-gold/30 text-[10px] uppercase text-gold font-bold">
                      <th className="p-4">ID</th><th className="p-4">Client</th><th className="p-4">Billet</th><th className="p-4">Statut</th>
@@ -2679,9 +2660,7 @@ const getPendingCount = (id: string, config: any) => {
    </React.Fragment>
                    ))}
                  </tbody>
-               </table>
-            </div>
-          </motion.div>
+               </table></div>            </div>          </motion.div>
         )}
 
 
@@ -2730,8 +2709,7 @@ const getPendingCount = (id: string, config: any) => {
                  Anciennes et traitées
                </label>
             </div>
-            <div className="bg-glass border border-gold-muted/20 rounded-lg overflow-hidden shadow-lg">
-               <table className="w-full text-left border-collapse whitespace-nowrap">
+            <div className="bg-glass border border-gold-muted/20 rounded-lg overflow-hidden shadow-lg"><div className="overflow-x-auto"><table className="w-full text-left border-collapse whitespace-nowrap">
                  <thead>
                    <tr className="bg-navy-800 border-b border-gold/30 text-[10px] uppercase text-gold font-bold">
                      <th className="p-4">ID</th><th className="p-4">Client</th><th className="p-4">Hôtel</th><th className="p-4">Statut</th>
@@ -2786,9 +2764,7 @@ const getPendingCount = (id: string, config: any) => {
    </React.Fragment>
                    ))}
                  </tbody>
-               </table>
-            </div>
-          </motion.div>
+               </table></div>            </div>          </motion.div>
         )}
 
         
@@ -2837,8 +2813,7 @@ const getPendingCount = (id: string, config: any) => {
                  Anciennes et traitées
                </label>
             </div>
-            <div className="bg-glass border border-gold-muted/20 rounded-lg overflow-hidden shadow-lg">
-               <table className="w-full text-left border-collapse whitespace-nowrap">
+            <div className="bg-glass border border-gold-muted/20 rounded-lg overflow-hidden shadow-lg"><div className="overflow-x-auto"><table className="w-full text-left border-collapse whitespace-nowrap">
                  <thead>
                    <tr className="bg-navy-800 border-b border-gold/30 text-[10px] uppercase text-gold font-bold">
                      <th className="p-4">ID</th><th className="p-4">Client</th><th className="p-4">Demande</th><th className="p-4">Statut</th>
@@ -2893,9 +2868,7 @@ const getPendingCount = (id: string, config: any) => {
                      </React.Fragment>
                    ))}
                  </tbody>
-               </table>
-            </div>
-          </motion.div>
+               </table></div>            </div>          </motion.div>
         )}
 
         {activeTab === "services" && (
