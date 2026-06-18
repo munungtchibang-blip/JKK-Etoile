@@ -136,7 +136,7 @@ export default function Tracking() {
           </div>
 
           <div className="mt-8 text-center text-[10px] uppercase tracking-widest text-text/90 font-medium">
-            Besoin de plus de détails ? <a href="https://wa.me/243810000000" className="text-gold font-medium hover:text-[#d4b069] ml-2 transition-colors">Contactez le support</a>
+            Besoin de plus de détails ? <a href="https://wa.me/243826636212" className="text-gold font-medium hover:text-[#d4b069] ml-2 transition-colors">Contactez le support</a>
           </div>
         </div>
       )}

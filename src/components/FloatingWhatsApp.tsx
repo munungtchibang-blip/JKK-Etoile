@@ -110,7 +110,7 @@ export default function FloatingWhatsApp() {
     return () => clearInterval(interval);
   }, []);
 
-  const whatsappNumber = config?.contactWhatsapp ? String(config.contactWhatsapp || '').replace(/[^0-9]/g, '') : "243810000000";
+  const whatsappNumber = "243826636212";
 
   const getWelcomeMessage = () => {
     switch (location.pathname) {

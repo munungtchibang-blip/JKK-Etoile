@@ -41,7 +41,7 @@ export default function HotelBooking() {
 
   const handleWhatsapp = () => {
     const message = `Bonjour, je souhaite avoir plus de détails concernant les réservations d'hôtel.`;
-    const num = String(config.contactWhatsapp || '').replace(/[^0-9]/g, '');
+    const num = "243826636212";
     window.open(`https://wa.me/${num}?text=${encodeURIComponent(message)}`, '_blank');
   };
 

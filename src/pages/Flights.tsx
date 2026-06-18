@@ -1,5 +1,5 @@
 import { Reviews } from "../components/Reviews";
-import { useState, FormEvent } from 'react';
+import { useState, useEffect, FormEvent } from 'react';
 import { motion } from 'motion/react';
 import { Search, Loader2, Plane } from 'lucide-react';
 
@@ -99,8 +99,14 @@ function FlightStatusWidget() {
 
 export default function Flights() {
   const [loading, setLoading] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(true);
   const [submitted, setSubmitted] = useState(false);
   const { config, updateConfig } = useSiteConfig();
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsPageLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   const [date, setDate] = useState('');
   const [passengers, setPassengers] = useState('1');
@@ -144,7 +150,7 @@ export default function Flights() {
     setSubmitted(true);
     
     const message = `Bonjour, je souhaite réserver un vol de Kinshasa à Dubai pour le ${date} (${passengers} passager(s)). Nom: ${name}, Télephone: ${phone}`;
-    const num = String(config.contactWhatsapp || '').replace(/[^0-9]/g, '');
+    const num = "243826636212";
     window.open(`https://wa.me/${num}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -152,9 +158,21 @@ export default function Flights() {
 
   const handleWhatsappForm = () => {
     const message = `Bonjour, je souhaite avoir plus de détails concernant les billets d'avion.`;
-    const num = String(config.contactWhatsapp || '').replace(/[^0-9]/g, '');
+    const num = "243826636212";
     window.open(`https://wa.me/${num}?text=${encodeURIComponent(message)}`, '_blank');
   };
+
+  if (isPageLoading) {
+    return (
+      <div className="pt-24 min-h-screen bg-navy pb-20 animate-pulse">
+        <div className="w-full h-64 md:h-80 bg-navy-800 mb-12"></div>
+        <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+          <div className="h-64 bg-navy-800 border border-gold-muted/20 rounded-2xl mb-12 -mt-24 relative z-10 w-full max-w-3xl mx-auto"></div>
+          <div className="h-96 bg-navy-800 border border-gold-muted/20 rounded"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="pt-24 min-h-screen bg-navy pb-20">

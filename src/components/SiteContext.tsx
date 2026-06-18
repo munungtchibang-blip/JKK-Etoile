@@ -349,7 +349,11 @@ export function SiteProvider({ children }: { children: ReactNode }) {
     const docRef = doc(db, 'settings', 'global');
     const unsubscribe = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
-        const firestoreConfig = docSnap.data() as SiteConfig;
+        let firestoreConfig = docSnap.data() as SiteConfig;
+        
+        if (firestoreConfig.contactWhatsapp === '+243 82 663 621' || firestoreConfig.contactWhatsapp === '24382663621' || !firestoreConfig.contactWhatsapp) {
+           firestoreConfig.contactWhatsapp = '+243 82 663 6212';
+        }
         
         // Ensure admins are merged properly if missing
         const mergedAdmins = firestoreConfig.admins?.length ? firestoreConfig.admins : ['mushitujacques3@gmail.com'];

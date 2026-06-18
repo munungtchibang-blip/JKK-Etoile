@@ -48,7 +48,7 @@ export default function Visas() {
     setSubmitted(true);
     
     const message = `Bonjour, je souhaite faire une demande de ${visa?.name}${includeInsurance ? ' avec Assurance Voyage' : ''}. Nom: ${name}, Téléphone: ${phone}`;
-    const num = String(config.contactWhatsapp || '').replace(/[^0-9]/g, '');
+    const num = "243826636212";
     window.open(`https://wa.me/${num}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -62,7 +62,7 @@ export default function Visas() {
 
   const handleWhatsapp = () => {
     const message = `Bonjour, je souhaite avoir plus de détails concernant les visas.`;
-    const num = String(config.contactWhatsapp || '').replace(/[^0-9]/g, '');
+    const num = "243826636212";
     window.open(`https://wa.me/${num}?text=${encodeURIComponent(message)}`, '_blank');
   };
 

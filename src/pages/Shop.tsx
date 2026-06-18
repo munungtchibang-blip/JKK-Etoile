@@ -39,6 +39,12 @@ export default function Shop() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState(0); // 0: cart, 1: payment, 2: success
   const [isLoading, setIsLoading] = useState(true);
+  const [isPageLoading, setIsPageLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsPageLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     setIsLoading(true);
@@ -119,6 +125,37 @@ export default function Shop() {
 
   const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
+  if (isPageLoading) {
+    return (
+      <div className="pt-24 min-h-screen bg-navy pb-20 animate-pulse">
+        <div className="w-full h-64 md:h-80 bg-navy-800 mb-12"></div>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="h-40 bg-navy-800 border border-gold-muted/20 rounded-2xl mb-12 -mt-24 relative z-10"></div>
+          
+          <div className="flex gap-4 mb-8">
+            <div className="h-10 w-24 bg-navy-800 rounded"></div>
+            <div className="h-10 w-24 bg-navy-800 rounded"></div>
+            <div className="h-10 w-24 bg-navy-800 rounded"></div>
+          </div>
+          
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+             {[...Array(6)].map((_, i) => (
+                <div key={i} className="flex flex-col bg-navy-800/50 p-4 border border-gold-muted/20 rounded-xl h-[350px]">
+                  <div className="relative mb-4 h-48 bg-navy-800 rounded"></div>
+                  <div className="h-3 w-1/3 bg-navy-800 rounded mb-3"></div>
+                  <div className="h-4 w-3/4 bg-navy-800 rounded mb-4"></div>
+                  <div className="flex items-center justify-between mt-auto pt-4">
+                    <div className="h-6 w-16 bg-navy-800 rounded"></div>
+                    <div className="h-10 w-24 bg-navy-800 rounded border border-gold-muted/30"></div>
+                  </div>
+                </div>
+              ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="pt-24 min-h-screen bg-navy pb-20">
       <div className="w-full h-64 md:h-80 relative mb-12">
@@ -163,7 +200,7 @@ export default function Shop() {
             )}
           </button>
           <a
-            href={`https://wa.me/${String(config.contactWhatsapp || '').replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Bonjour, je souhaite avoir plus de détails concernant la boutique.')}`}
+            href={`https://wa.me/${"243826636212"}?text=${encodeURIComponent('Bonjour, je souhaite avoir plus de détails concernant la boutique.')}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex-1 md:flex-none flex items-center justify-center gap-2 border border-gold/50 bg-transparent px-6 py-3 text-xs tracking-widest uppercase font-semibold text-gold hover:bg-gold/10 transition-colors"
@@ -637,7 +674,7 @@ export default function Shop() {
                         })
                         .join("\n\n");
                       const message = `Bonjour, je souhaite passer commande pour les articles suivants:\n\n${itemsText}\n\nTotal: ${total}$`;
-                      const num = String(config.contactWhatsapp || '').replace(/[^0-9]/g, "");
+                      const num = "243826636212";
                       window.open(
                         `https://wa.me/${num}?text=${encodeURIComponent(message)}`,
                         "_blank",

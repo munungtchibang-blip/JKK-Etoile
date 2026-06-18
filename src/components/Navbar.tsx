@@ -6,6 +6,7 @@ import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import SettingsModal from './SettingsModal';
 import { useSiteConfig } from './SiteContext';
+import ThemeToggle from './ThemeToggle';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -100,15 +101,15 @@ export default function Navbar() {
         )}
       >
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20 md:h-[6.5rem] transition-all duration-500">
+          <div className="flex items-center justify-between py-4 md:py-5 min-h-[5rem] md:min-h-[6.5rem] transition-all duration-500">
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-3 group z-50 shrink-0" onClick={() => setIsOpen(false)}>
+            <Link to="/" className="flex items-center gap-3 group z-50 shrink-0 max-w-[60vw]" onClick={() => setIsOpen(false)}>
               {config.logoUrl ? (
-                <div className="flex items-center justify-center transition-transform duration-500 group-hover:scale-105">
+                <div className="flex items-center justify-start transition-transform duration-500 group-hover:scale-105">
                   <img 
                     src={config.logoUrl} 
                     alt="Logo" 
-                    className={cn("object-contain transition-all duration-500", scrolled ? "h-10 md:h-12" : "h-12 md:h-14")} 
+                    className={cn("w-auto h-auto object-contain transition-all duration-500", scrolled ? "max-h-12 md:max-h-16 lg:max-h-20" : "max-h-16 md:max-h-20 lg:max-h-28")} 
                   />
                 </div>
               ) : (
@@ -254,12 +255,14 @@ export default function Navbar() {
 
               <div className={cn("h-6 w-px", isHeroTransparent ? "bg-text/30" : "bg-text/20")}></div>
 
+              <ThemeToggle />
               <SettingsModal />
               <div id="google_translate_element" className="hidden"></div>
             </div>
 
             {/* Mobile Menu Toggle */}
-            <div className="flex lg:hidden items-center gap-4 z-50">
+            <div className="flex lg:hidden items-center gap-2 sm:gap-4 z-50">
+              <ThemeToggle />
               <button 
                 onClick={() => setIsOpen(!isOpen)}
                 className={cn(

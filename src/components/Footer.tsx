@@ -21,8 +21,8 @@ export default function Footer() {
           <div className="space-y-4">
             <Link to="/" className="flex items-center gap-2 text-xl font-bold tracking-[2px] text-gold uppercase mb-4">
               {config.logoUrl ? (
-                <div className="w-full max-w-[200px] py-3 transition-all duration-500 hover:scale-105 flex justify-start items-center">
-                  <img src={config.logoUrl} alt="Logo" className="max-h-12 w-auto object-contain" />
+                <div className="w-full max-w-[300px] py-3 transition-all duration-500 hover:scale-105 flex justify-start items-center">
+                  <img src={config.logoUrl} alt="Logo" className="max-h-16 md:max-h-24 lg:max-h-28 w-auto object-contain" />
                 </div>
               ) : (
                 'JKK ETOILE'
@@ -53,7 +53,7 @@ export default function Footer() {
                 </a>
               )}
               {config.contactWhatsapp && (
-                <a href={`https://wa.me/${String(config.contactWhatsapp || '').replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-text/90 font-medium hover:text-gold transition-colors">
+                <a href={`https://wa.me/243826636212`} target="_blank" rel="noopener noreferrer" className="text-text/90 font-medium hover:text-gold transition-colors">
                   <MessageCircle size={20} />
                 </a>
               )}
