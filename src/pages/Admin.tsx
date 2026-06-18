@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Package, Users, ShoppingBag, Car, Plane, Search, Bell, Settings as SettingsIcon, LogOut, ChevronRight, BarChart3, Edit, Trash2, CheckCircle, CheckCircle2, Clock, Truck, XCircle, UploadCloud, X, Image as ImageIcon, Home as HomeIcon, ArrowDownCircle, Megaphone, Star, RefreshCcw, CreditCard, MessageCircle, Pencil, Mail, FileText, Building2, Plus, Save } from 'lucide-react';
+import { Package, Users, ShoppingBag, Car, Plane, Search, Bell, Settings as SettingsIcon, LogOut, ChevronRight, BarChart3, Edit, Trash2, CheckCircle, CheckCircle2, Clock, Truck, XCircle, UploadCloud, X, Image as ImageIcon, Home as HomeIcon, ArrowDownCircle, Megaphone, Star, RefreshCcw, CreditCard, MessageCircle, Pencil, Mail, FileText, Building2, Plus, Save, Menu } from 'lucide-react';
 import { motion, AnimatePresence } from "motion/react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSiteConfig, AnnouncementItem } from "../components/SiteContext";
@@ -39,6 +39,7 @@ export default function Admin() {
   };
 
   const [activeTab, setActiveTab] = useState("dashboard");
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [expandedOrderId, setExpandedOrderId] = useState<string | null>(null);
   const [showArchived, setShowArchived] = useState(false);
   const [selectedClientName, setSelectedClientName] = useState<string | null>(null);
@@ -708,13 +709,40 @@ const getPendingCount = (id: string, config: any) => {
 
   return (
     <div className="flex h-screen bg-navy text-text pt-0">
+      {/* Mobile Header */}
+      <div className="md:hidden fixed top-0 w-full z-30 bg-navy-800 border-b border-gold-muted/20 px-4 py-3 flex items-center justify-between">
+        <h2 className="text-xl font-display tracking-wide">Gestion JKK</h2>
+        <button 
+          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          className="text-text hover:text-gold p-2 border border-gold-muted/20 rounded-md bg-glass"
+        >
+          <Menu size={24} />
+        </button>
+      </div>
+
+      {/* Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-30 md:hidden" 
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-64 bg-navy-800 border-r border-gold-muted/20 flex flex-col hidden md:flex h-screen fixed z-20 top-0">
-        <div className="p-6 border-b border-gold-muted/20">
-          <span className="text-[10px] uppercase tracking-[3px] text-gold block mb-2">
-            Panel Administrateur
-          </span>
-          <h2 className="text-xl font-display tracking-wide">Gestion JKK</h2>
+      <aside className={`w-64 bg-navy-800 border-r border-gold-muted/20 flex flex-col h-screen fixed z-40 top-0 transition-transform duration-300 md:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-6 border-b border-gold-muted/20 flex justify-between items-center">
+          <div>
+            <span className="text-[10px] uppercase tracking-[3px] text-gold block mb-2">
+              Panel Administrateur
+            </span>
+            <h2 className="text-xl font-display tracking-wide">Gestion JKK</h2>
+          </div>
+          <button 
+            className="md:hidden text-text/60 hover:text-text"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <X size={20} />
+          </button>
         </div>
 
         <nav className="flex-1 overflow-y-auto py-6 px-4 space-y-2">
@@ -723,7 +751,10 @@ const getPendingCount = (id: string, config: any) => {
              return (
                <button
                  key={item.id}
-                 onClick={() => setActiveTab(item.id)}
+                 onClick={() => {
+                   setActiveTab(item.id);
+                   setIsMobileMenuOpen(false);
+                 }}
                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-300 ${activeTab === item.id ? "bg-gold/10 text-gold border border-gold/20" : "text-text/60 hover:text-text hover:bg-white/5"}`}
                >
                  <div className="flex items-center gap-3">
@@ -752,7 +783,7 @@ const getPendingCount = (id: string, config: any) => {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 md:ml-64 bg-navy px-6 pb-6 md:px-10 md:pb-10 pt-0 overflow-y-auto">
+      <main className="flex-1 md:ml-64 bg-navy px-4 pb-6 md:px-10 md:pb-10 pt-16 md:pt-0 overflow-y-auto">
         <header className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-4 mt-0 pt-6">
           <div>
             <h1 className="text-3xl font-display">Administration</h1>
