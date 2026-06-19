@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, ReactNode } from 'react';
 import { motion, useScroll, useTransform, AnimatePresence } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { Plane, FileText, ShoppingBag, Car, Star, ArrowRight, ArrowLeft, X, Building2, ShieldCheck, CreditCard, Package, RefreshCcw } from 'lucide-react';
@@ -76,7 +76,7 @@ const NEWS = [
   }
 ];
 
-function AutoScrollCarousel({ items, renderItem, speed = 1 }: { items: any[], renderItem: (item: any, idx: number) => React.ReactNode, speed?: number }) {
+function AutoScrollCarousel({ items, renderItem, speed = 1 }: { items: any[], renderItem: (item: any, idx: number) => ReactNode, speed?: number }) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [isHovered, setIsHovered] = useState(false);
 
@@ -170,11 +170,15 @@ export default function Home() {
   const { config } = useSiteConfig();
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  const heroImages = [
-    config.heroImageUrl || "https://images.unsplash.com/photo-1542282088-fe8426682b8f?q=80&w=1887&auto=format&fit=crop", // Default
-    "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=2070&auto=format&fit=crop", // Dubai
-    "https://images.unsplash.com/photo-1586528116311-ad8ed7c426e2?q=80&w=2070&auto=format&fit=crop", // Cargo
-  ];
+  const resolvedHeroImages = (config.heroImages && config.heroImages.length > 0)
+    ? config.heroImages
+    : [
+        config.heroImageUrl || "https://images.unsplash.com/photo-1542282088-fe8426682b8f?q=80&w=1887&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=2070&auto=format&fit=crop",
+        "https://images.unsplash.com/photo-1586528116311-ad8ed7c426e2?q=80&w=2070&auto=format&fit=crop",
+      ];
+
+  const heroImages = resolvedHeroImages.filter(Boolean);
 
   const handleNextImage = () => {
     setCurrentImageIndex((prev) => (prev + 1) % heroImages.length);

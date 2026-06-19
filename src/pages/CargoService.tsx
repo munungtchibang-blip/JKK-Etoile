@@ -4,6 +4,69 @@ import { Package, MapPin, Scale, Container, User, Mail, Phone } from 'lucide-rea
 import { motion } from 'motion/react';
 import { useSiteConfig } from '../components/SiteContext';
 import { LazyImage } from '../components/LazyImage';
+import toast from 'react-hot-toast';
+
+function FreightSimulator() {
+  const [weight, setWeight] = useState<number>(0);
+  const [type, setType] = useState<'air' | 'sea'>('air');
+  const [destination, setDestination] = useState<'kinshasa' | 'lubumbashi' | 'other'>('kinshasa');
+
+  const calculateEstimate = () => {
+    if (!weight) return 0;
+    
+    let baseRate = type === 'air' ? 12 : 4; // USD per kg
+    if (destination === 'lubumbashi') baseRate += type === 'air' ? 3 : 2;
+    if (destination === 'other') baseRate += type === 'air' ? 5 : 3;
+
+    return weight * baseRate;
+  };
+
+  const estimate = calculateEstimate();
+
+  return (
+    <div className="bg-navy-800/80 border border-gold-muted/30 p-6 rounded-2xl h-full flex flex-col mt-8 lg:mt-0 lg:ml-8">
+      <h3 className="text-xl font-display text-gold mb-6 border-b border-gold-muted/20 pb-4">Simulateur Rapide</h3>
+      <div className="space-y-4 flex-grow">
+        <div>
+          <label className="text-[10px] text-text/90 uppercase tracking-widest block mb-2">Type d'envoi</label>
+          <div className="flex gap-2">
+            <button 
+              type="button"
+              onClick={() => setType('air')} 
+              className={`flex-1 py-2 text-xs uppercase tracking-wider rounded border ${type === 'air' ? 'bg-gold/20 border-gold text-gold' : 'bg-transparent border-text/20 text-text/70'} transition-colors`}
+            >
+              Aérien
+            </button>
+            <button 
+               type="button"
+               onClick={() => setType('sea')} 
+               className={`flex-1 py-2 text-xs uppercase tracking-wider rounded border ${type === 'sea' ? 'bg-gold/20 border-gold text-gold' : 'bg-transparent border-text/20 text-text/70'} transition-colors`}
+             >
+               Maritime
+             </button>
+          </div>
+        </div>
+        <div>
+           <label className="text-[10px] text-text/90 uppercase tracking-widest block mb-2">Poids (kg) / Vol. (CBM)</label>
+           <input type="number" min="0" value={weight || ''} onChange={(e) => setWeight(Number(e.target.value))} placeholder="Ex: 50" className="w-full bg-navy border border-text/20 p-2 text-text text-sm focus:outline-none focus:border-gold" />
+        </div>
+        <div>
+          <label className="text-[10px] text-text/90 uppercase tracking-widest block mb-2">Destination</label>
+          <select value={destination} onChange={(e) => setDestination(e.target.value as any)} className="w-full bg-navy border border-text/20 p-2 text-text text-sm focus:outline-none focus:border-gold appearance-none">
+             <option value="kinshasa">Kinshasa</option>
+             <option value="lubumbashi">Lubumbashi</option>
+             <option value="other">Autre Province</option>
+          </select>
+        </div>
+      </div>
+      <div className="mt-6 bg-glass p-4 rounded border border-gold/20 text-center">
+        <div className="text-[10px] text-text/70 uppercase tracking-widest mb-1">Estimation Approximative</div>
+        <div className="text-3xl font-light text-gold tracking-wider">${estimate > 0 ? estimate.toLocaleString('fr-FR') : '0'}</div>
+        <div className="text-[9px] text-text/50 mt-2 uppercase tracking-widest">*Tarif indicatif sans engagement.</div>
+      </div>
+    </div>
+  );
+}
 
 export default function CargoService() {
   const { config, updateConfig } = useSiteConfig();
@@ -33,6 +96,7 @@ export default function CargoService() {
     });
     
     setSubmitted(true);
+    toast.success('Demande d\'expédition envoyée avec succès !');
   };
 
   const serviceInfo = config.services?.find(s => s.link === '/cargo');
@@ -77,27 +141,28 @@ export default function CargoService() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="bg-glass border border-gold-muted/50 p-8 md:p-12 rounded-2xl"
       >
-        {submitted ? (
-           <div className="text-center py-12">
-             <div className="mx-auto w-16 h-16 bg-gold/20 rounded-full flex items-center justify-center mb-6">
-                <Package size={32} className="text-gold" />
-             </div>
-             <h2 className="text-2xl font-light text-text mb-4">Demande de devis envoyée !</h2>
-             <p className="text-sm text-text/70 uppercase tracking-widest leading-relaxed">
-               Merci {name}. Votre demande d'expédition pour {weight} a bien été enregistrée.
-               Notre équipe logistique va vous contacter rapidement au {phone} avec une proposition.
-             </p>
-             <button
-               onClick={() => setSubmitted(false)}
-               className="mt-8 bg-navy border border-gold-muted py-3 px-8 text-xs font-bold uppercase tracking-[2px] text-text hover:bg-white/5 transition-all"
-             >
-               Faire une autre demande
-             </button>
-           </div>
-        ) : (
-        <form onSubmit={handleSubmit} className="space-y-6 text-sm font-medium">
+        <div className="grid grid-cols-1 lg:grid-cols-3">
+          <div className="lg:col-span-2 bg-glass border border-gold-muted/50 p-8 md:p-12 rounded-2xl">
+            {submitted ? (
+               <div className="text-center py-12">
+                 <div className="mx-auto w-16 h-16 bg-gold/20 rounded-full flex items-center justify-center mb-6">
+                    <Package size={32} className="text-gold" />
+                 </div>
+                 <h2 className="text-2xl font-light text-text mb-4">Demande de devis envoyée !</h2>
+                 <p className="text-sm text-text/70 uppercase tracking-widest leading-relaxed">
+                   Merci {name}. Votre demande d'expédition pour {weight} a bien été enregistrée.
+                   Notre équipe logistique va vous contacter rapidement au {phone} avec une proposition.
+                 </p>
+                 <button
+                   onClick={() => setSubmitted(false)}
+                   className="mt-8 bg-navy border border-gold-muted py-3 px-8 text-xs font-bold uppercase tracking-[2px] text-text hover:bg-white/5 transition-all"
+                 >
+                   Faire une autre demande
+                 </button>
+               </div>
+            ) : (
+            <form onSubmit={handleSubmit} className="space-y-6 text-sm font-medium">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="md:col-span-2 grid grid-cols-1 md:grid-cols-3 gap-6 pt-2 pb-6 border-b border-gold-muted/20">
               <div className="space-y-2">
@@ -214,7 +279,14 @@ export default function CargoService() {
           </div>
         </form>
         )}
+      </div>
+      <div className="lg:col-span-1">
+        <FreightSimulator />
+      </div>
+    </div>
+    <div className="mt-12 bg-glass border border-gold-muted/50 p-8 md:p-12 rounded-2xl">
       <Reviews serviceTitle="Service cargo" />
+    </div>
 </motion.div>
       </div>
 </div>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, ShieldCheck } from 'lucide-react';
 import { motion } from 'motion/react';
+import toast from 'react-hot-toast';
 
 const CARS = [
   { id: 1, brand: 'Toyota', model: 'Land Cruiser Prado', year: 2023, price: 45000, image: 'https://images.unsplash.com/photo-1590509653066-8a9d18db5469?q=80&w=1770&auto=format&fit=crop' },
@@ -110,7 +111,13 @@ export default function CarOrder() {
 
         <div>
           <h3 className="text-[13px] uppercase tracking-[1px] font-semibold text-gold mb-6">Vos Coordonnées</h3>
-          <form className="space-y-8" onSubmit={(e) => { e.preventDefault(); if (isNameValid && isPhoneValid && isEmailValid) setSubmitted(true); }}>
+          <form className="space-y-8" onSubmit={(e) => { 
+              e.preventDefault(); 
+              if (isNameValid && isPhoneValid && isEmailValid) {
+                  setSubmitted(true);
+                  toast.success('Commande confirmée avec succès !');
+              }
+          }}>
             <div className="flex flex-col gap-2 relative">
               <label className="text-[10px] uppercase text-gold tracking-[1.5px]">Nom complet</label>
               <input 

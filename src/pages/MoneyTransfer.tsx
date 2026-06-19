@@ -4,6 +4,7 @@ import { CreditCard, ArrowRight, Wallet, MapPin, User, Mail, Phone, Smartphone }
 import { motion } from 'motion/react';
 import { useSiteConfig } from '../components/SiteContext';
 import { LazyImage } from '../components/LazyImage';
+import toast from 'react-hot-toast';
 
 export default function MoneyTransfer() {
   const { config, updateConfig } = useSiteConfig();
@@ -54,6 +55,7 @@ export default function MoneyTransfer() {
       
       setVerifying(false);
       setSubmitted(true);
+      toast.success('Demande de transfert initiée avec succès !');
     }, 2000);
   };
 

@@ -2,6 +2,7 @@ import { MapPin, Phone, Mail, Clock, Send, ChevronDown, ChevronUp, CheckCircle }
 import { useState, FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSiteConfig } from '../components/SiteContext';
+import toast from 'react-hot-toast';
 
 const FAQS = [
   {
@@ -66,6 +67,7 @@ export default function Contact() {
 
       setIsSubmitting(false);
       setSubmitSuccess(true);
+      toast.success('Message envoyé avec succès !');
       setName('');
       setPhone('');
       setEmail('');

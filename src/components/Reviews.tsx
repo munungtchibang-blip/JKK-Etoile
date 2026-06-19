@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useSiteConfig, ReviewItem } from './SiteContext';
 import { Star, Send } from 'lucide-react';
 import { motion } from 'motion/react';
+import toast from 'react-hot-toast';
 
 interface ReviewsProps {
   serviceId?: string;
@@ -33,6 +34,7 @@ export function Reviews({ serviceId, serviceTitle, className, layout = 'horizont
 
     updateConfig({ reviews: [...(config.reviews || []), newReview] });
     setSubmitted(true);
+    toast.success('Avis envoyé avec succès ! Il est en attente de modération.');
     setName('');
     setComment('');
     setRating(5);

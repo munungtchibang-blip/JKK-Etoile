@@ -24,12 +24,25 @@ import CargoService from './pages/CargoService';
 import MobileMoneyService from './pages/MobileMoneyService';
 import { ThemeProvider } from './components/ThemeContext';
 import { SiteProvider } from './components/SiteContext';
+import { Toaster } from 'react-hot-toast';
 
 export default function App() {
   return (
     <SiteProvider>
       <ThemeProvider>
         <BrowserRouter>
+          <Toaster 
+            position="bottom-center"
+            toastOptions={{
+              className: 'bg-navy-800 text-text border border-gold/30',
+              style: {
+                borderRadius: '8px',
+                background: '#1A2942',
+                color: '#fff',
+                border: '1px solid rgba(212, 176, 105, 0.3)',
+              },
+            }}
+          />
           <Routes>
             <Route path="/admin" element={<Admin />} />
             <Route path="/" element={<Layout />}>

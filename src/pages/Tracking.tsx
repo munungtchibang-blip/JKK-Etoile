@@ -67,7 +67,21 @@ export default function Tracking() {
                 </div>
                 <div>
                   <div className="text-[10px] uppercase tracking-widest text-text/90 font-medium mb-1">{trackingData.type}</div>
-                  <div className="text-xl font-light text-text tracking-[2px]">{trackingNumber.toUpperCase()}</div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-xl font-light text-text tracking-[2px]">{trackingNumber.toUpperCase()}</div>
+                    <button 
+                      onClick={() => {
+                        navigator.clipboard.writeText(trackingNumber.toUpperCase());
+                        import('react-hot-toast').then(({ default: toast }) => {
+                          toast.success('Numéro copié dans le presse-papier !');
+                        });
+                      }}
+                      className="p-1.5 bg-navy-800 text-gold rounded hover:bg-gold hover:text-navy transition-colors border border-gold/30 hover:border-gold"
+                      title="Copier le numéro"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                    </button>
+                  </div>
                 </div>
               </div>
               <div className="text-left md:text-right flex flex-col justify-center border-t border-gold-muted/30 pt-4 md:border-t-0 md:pt-0">

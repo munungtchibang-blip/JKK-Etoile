@@ -3,6 +3,7 @@ import React from 'react';
 import { motion } from 'motion/react';
 import { CreditCard, Phone, CheckCircle } from 'lucide-react';
 import { useSiteConfig } from '../components/SiteContext';
+import toast from 'react-hot-toast';
 
 export default function MobileMoneyService() {
   const { config } = useSiteConfig();
@@ -60,7 +61,7 @@ export default function MobileMoneyService() {
                         const val = config.agencyAccounts?.[option];
                         if (val) {
                           navigator.clipboard.writeText(val);
-                          alert('Copié !');
+                          toast.success('Numéro copié !');
                         }
                     }}
                     title="Cliquez pour copier"

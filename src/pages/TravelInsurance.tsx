@@ -4,6 +4,7 @@ import { ShieldCheck, Calendar, Plane, HeartPulse, User, Mail, Phone } from 'luc
 import { motion } from 'motion/react';
 import { useSiteConfig } from '../components/SiteContext';
 import { LazyImage } from '../components/LazyImage';
+import toast from 'react-hot-toast';
 
 export default function TravelInsurance() {
   const { config, updateConfig } = useSiteConfig();
@@ -34,6 +35,7 @@ export default function TravelInsurance() {
     });
     
     setSubmitted(true);
+    toast.success('Demande d\'assurance envoyée avec succès !');
   };
 
   const serviceInfo = config.services?.find(s => s.link === '/travel-insurance');

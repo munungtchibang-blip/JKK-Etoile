@@ -47,6 +47,7 @@ export default function Admin() {
   const isArchived = (s: string) => finalStatuses.includes(s);
   const [expandedTransferId, setExpandedTransferId] = useState<string | null>(null);
   const [selectedMessage, setSelectedMessage] = useState<any>(null);
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   const handleMessageClick = (msg: any) => {
     setSelectedMessage(msg);
@@ -506,7 +507,7 @@ export default function Admin() {
                     const img = new Image();
                     img.onload = () => {
                       const canvas = document.createElement('canvas');
-                      const MAX_WIDTH = 800; // Resize to max 800px width
+                      const MAX_WIDTH = 500; // Resize to max 500px width
                       let width = img.width;
                       let height = img.height;
                       
@@ -518,7 +519,7 @@ export default function Admin() {
                       canvas.height = height;
                       const ctx = canvas.getContext('2d');
                       ctx?.drawImage(img, 0, 0, width, height);
-                      const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                      const compressedDataUrl = canvas.toDataURL('image/webp', 0.4);
                       newImages.push(compressedDataUrl);
                       processedCount++;
                       if (processedCount === files.length) {
@@ -580,7 +581,7 @@ export default function Admin() {
                   const canvas = document.createElement('canvas');
                   let width = img.width;
                   let height = img.height;
-                  const MAX_DIMENSION = 800;
+                  const MAX_DIMENSION = 500;
                   if (width > height && width > MAX_DIMENSION) {
                     height *= MAX_DIMENSION / width;
                     width = MAX_DIMENSION;
@@ -592,7 +593,7 @@ export default function Admin() {
                   canvas.height = height;
                   const ctx = canvas.getContext('2d');
                   ctx?.drawImage(img, 0, 0, width, height);
-                  const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.6);
+                  const compressedDataUrl = canvas.toDataURL('image/webp', 0.4);
                   onChange(compressedDataUrl);
                 };
                 img.src = event.target?.result as string;
@@ -824,6 +825,53 @@ const getPendingCount = (id: string, config: any) => {
                    </div>
                  </div>
                ))}
+             </div>
+
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+               {(() => {
+                  const currentImages = ((config.heroImages && config.heroImages.length > 0) ? config.heroImages : [config.heroImageUrl]).filter(Boolean);
+                  const currentSize = new Blob([JSON.stringify(currentImages)]).size;
+                  const maxSize = 1000000;
+                  const diskPercentage = Math.min(100, (currentSize / maxSize) * 100);
+                  const interactions = (config.messages?.length || 0) + (config.reviews?.length || 0);
+                  
+                  return (
+                    <>
+                      <div className="bg-glass border border-gold-muted/20 p-6 rounded-lg relative overflow-hidden shadow-lg flex items-center justify-between">
+                         <div>
+                            <span className="text-[11px] uppercase tracking-wider text-text/70 font-medium block mb-2">Images Hero</span>
+                            <span className="text-2xl font-display text-text">{currentImages.length} actives</span>
+                         </div>
+                         <div className="w-12 h-12 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400">
+                           <ImageIcon size={24} />
+                         </div>
+                      </div>
+                      
+                      <div className="bg-glass border border-gold-muted/20 p-6 rounded-lg relative overflow-hidden shadow-lg flex items-center justify-between">
+                         <div className="flex-1 w-full mr-4">
+                            <span className="text-[11px] uppercase tracking-wider text-text/70 font-medium block mb-2">Espace Disque (Hero)</span>
+                            <div className="flex items-end justify-between mb-1">
+                               <span className="text-2xl font-display text-text">{diskPercentage.toFixed(1)}%</span>
+                               <span className="text-[10px] text-text/50">{(currentSize / 1024).toFixed(0)} KB / 1 MB</span>
+                            </div>
+                            <div className="w-full h-1.5 bg-navy border border-white/10 rounded-full overflow-hidden">
+                              <div className={`h-full ${diskPercentage > 85 ? 'bg-red-500' : 'bg-gold'} transition-all`} style={{ width: `${diskPercentage}%` }} />
+                            </div>
+                         </div>
+                      </div>
+
+                      <div className="bg-glass border border-gold-muted/20 p-6 rounded-lg relative overflow-hidden shadow-lg flex items-center justify-between">
+                         <div>
+                            <span className="text-[11px] uppercase tracking-wider text-text/70 font-medium block mb-2">Interactions Récentes</span>
+                            <span className="text-2xl font-display text-text">{interactions}</span>
+                         </div>
+                         <div className="w-12 h-12 rounded-full bg-green-500/10 flex items-center justify-center text-green-400">
+                           <MessageCircle size={24} />
+                         </div>
+                      </div>
+                    </>
+                  );
+               })()}
              </div>
              
              <div className="bg-glass border border-gold-muted/20 rounded-lg overflow-hidden flex flex-col">
@@ -2202,6 +2250,51 @@ const getPendingCount = (id: string, config: any) => {
                 hidden: { opacity: 0, scale: 0.98 },
                 show: { opacity: 1, scale: 1 },
               }}
+              className={`border p-6 rounded-lg space-y-4 transition-all duration-300 ${config.maintenanceMode ? 'bg-red-500/10 border-red-500/40 shadow-lg shadow-red-500/10' : 'bg-glass border-gold-muted/20'}`}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className={`text-lg font-display ${config.maintenanceMode ? 'text-red-400' : 'text-gold'}`}>
+                    Mode Maintenance
+                  </h3>
+                  <p className="text-sm text-text/70 mt-1">Activez ce mode pour rendre le site inaccessible aux utilisateurs pendant vos mises à jour.</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    value="" 
+                    className="sr-only peer" 
+                    checked={!!config.maintenanceMode}
+                    onChange={(e) => {
+                      updateConfig({ maintenanceMode: e.target.checked });
+                      showToast(e.target.checked ? "Mode maintenance activé" : "Mode maintenance désactivé");
+                    }}
+                  />
+                  <div className="w-11 h-6 bg-navy-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-red-500"></div>
+                </label>
+              </div>
+              
+              {config.maintenanceMode && (
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="pt-4 border-t border-red-500/20">
+                  <label className="text-[10px] text-red-300/90 font-bold uppercase tracking-widest block mb-2">
+                    Message de Maintenance
+                  </label>
+                  <textarea
+                    value={config.maintenanceMessage || ""}
+                    onChange={(e) => updateConfig({ maintenanceMessage: e.target.value })}
+                    className="w-full bg-navy border border-red-500/30 p-3 rounded text-sm text-text focus:outline-none focus:border-red-400 whitespace-pre-wrap"
+                    rows={3}
+                    placeholder="Le site est actuellement en maintenance. Nous serons de retour dans quelques instants !"
+                  />
+                </motion.div>
+              )}
+            </motion.div>
+
+            <motion.div
+              variants={{
+                hidden: { opacity: 0, scale: 0.98 },
+                show: { opacity: 1, scale: 1 },
+              }}
               className="bg-glass border border-gold-muted/20 p-6 rounded-lg space-y-6"
             >
               <h3 className="text-lg font-display text-gold">
@@ -2217,13 +2310,123 @@ const getPendingCount = (id: string, config: any) => {
                     updateConfig({ logoUrl: val }),
                   )}
                 </div>
-                <div>
-                  <label className="text-[10px] text-text/90 font-medium uppercase tracking-widest block mb-2">
-                    Image Principale (Accueil)
-                  </label>
-                  {renderDropzone(config.heroImageUrl, (val) =>
-                    updateConfig({ heroImageUrl: val }),
-                  )}
+                <div className="md:col-span-2 mt-4">
+                  <div className="flex justify-between items-center mb-2">
+                    <label className="text-[10px] text-text/90 font-medium uppercase tracking-widest block">
+                      Images du Carousel (Accueil)
+                    </label>
+                    {(() => {
+                      const currentImages = ((config.heroImages && config.heroImages.length > 0) ? config.heroImages : [config.heroImageUrl]).filter(Boolean);
+                      const currentSize = new Blob([JSON.stringify(currentImages)]).size;
+                      const maxSize = 1000000; // ~1MB safe limit
+                      const percentage = Math.min(100, (currentSize / maxSize) * 100);
+                      const isNearLimit = percentage > 85;
+                      
+                      return (
+                        <div className="text-right">
+                          <span className={`text-[10px] uppercase font-bold tracking-wider ${isNearLimit ? 'text-red-400' : 'text-gold'}`}>
+                            Espace utilisé: {(currentSize / 1024).toFixed(1)} KB / {(maxSize / 1024).toFixed(0)} KB
+                          </span>
+                          <div className="w-32 h-1.5 bg-navy border border-white/10 rounded-full mt-1 overflow-hidden">
+                            <div 
+                              className={`h-full ${isNearLimit ? 'bg-red-500' : 'bg-gold'} transition-all`} 
+                              style={{ width: `${percentage}%` }}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 bg-navy-800/20 p-4 border border-gold-muted/10 rounded-lg">
+                    {((config.heroImages && config.heroImages.length > 0) ? config.heroImages : [config.heroImageUrl]).filter(Boolean).map((img, i) => (
+                      <div key={i} className="relative aspect-video rounded-lg overflow-hidden border border-gold-muted/30 group cursor-pointer" onClick={() => setPreviewImage(img)}>
+                         <img src={img} alt={`Slide ${i}`} className="w-full h-full object-cover" />
+                         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
+                           <button 
+                             onClick={(e) => {
+                               e.stopPropagation();
+                               const newImages = [...((config.heroImages && config.heroImages.length > 0) ? config.heroImages : [config.heroImageUrl]).filter(Boolean)];
+                               newImages.splice(i, 1);
+                               updateConfig({ heroImages: newImages });
+                             }}
+                             className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-full transform scale-75 group-hover:scale-100 transition-all"
+                             title="Supprimer cette image"
+                           >
+                             <X size={16} />
+                           </button>
+                         </div>
+                      </div>
+                    ))}
+                    {((config.heroImages && config.heroImages.length > 0) ? config.heroImages : [config.heroImageUrl]).filter(Boolean).length < 10 && (
+                      <div 
+                        className="border-2 border-dashed border-gold-muted/20 hover:border-gold/50 rounded-lg bg-navy/40 hover:bg-navy/60 transition-all flex flex-col items-center justify-center gap-2 cursor-pointer aspect-video"
+                        title="Ajouter une image compressée"
+                        onClick={() => {
+                          const input = document.createElement("input");
+                          input.type = "file";
+                          input.accept = "image/jpeg, image/png, image/webp";
+                          input.onchange = (e) => {
+                            const file = (e.target as HTMLInputElement).files?.[0];
+                            if (file) {
+                              // Basic size limit check before processing
+                              if (file.size > 10 * 1024 * 1024) {
+                                showToast("Erreur: Le fichier est trop volumineux (Max 10MB avant compression)");
+                                return;
+                              }
+                              
+                              const reader = new FileReader();
+                              reader.onload = (event) => {
+                                const img = new Image();
+                                img.onload = () => {
+                                  const canvas = document.createElement('canvas');
+                                  let width = img.width;
+                                  let height = img.height;
+                                  const MAX_DIMENSION = 1200; // Better quality for hero but compressed
+                                  
+                                  if (width > height && width > MAX_DIMENSION) {
+                                    height *= MAX_DIMENSION / width;
+                                    width = MAX_DIMENSION;
+                                  } else if (height > MAX_DIMENSION) {
+                                    width *= MAX_DIMENSION / height;
+                                    height = MAX_DIMENSION;
+                                  }
+                                  
+                                  canvas.width = width;
+                                  canvas.height = height;
+                                  const ctx = canvas.getContext('2d');
+                                  ctx?.drawImage(img, 0, 0, width, height);
+                                  
+                                  // Compress image heavily
+                                  const compressedDataUrl = canvas.toDataURL('image/webp', 0.6);
+                                  
+                                  const currentImages = [...((config.heroImages && config.heroImages.length > 0) ? config.heroImages : [config.heroImageUrl]).filter(Boolean)];
+                                  
+                                  // Calculate size implication
+                                  const newImages = [...currentImages, compressedDataUrl];
+                                  const newSize = new Blob([JSON.stringify(newImages)]).size;
+                                  const maxSize = 1000000;
+                                  
+                                  if (newSize > maxSize) {
+                                    showToast("Erreur: La taille limite est atteinte. Veuillez d'abord supprimer quelques images !");
+                                    return;
+                                  }
+                                  
+                                  updateConfig({ heroImages: newImages });
+                                  showToast("Image ajoutée et compressée avec succès !");
+                                };
+                                img.src = event.target?.result as string;
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          };
+                          input.click();
+                        }}
+                      >
+                        <Plus size={24} className="text-gold-muted mx-auto mb-1" />
+                        <span className="text-xs text-text/60">Upload & Compress</span>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -3167,6 +3370,35 @@ const getPendingCount = (id: string, config: any) => {
               </motion.div>
                 );
               })()}
+            </motion.div>
+          )}
+        </AnimatePresence>
+        <AnimatePresence>
+          {previewImage && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 p-4 backdrop-blur-sm"
+              onClick={() => setPreviewImage(null)}
+            >
+              <div className="relative max-w-5xl w-full h-full flex items-center justify-center">
+                <button
+                  onClick={() => setPreviewImage(null)}
+                  className="absolute top-4 right-4 bg-navy/80 hover:bg-gold hover:text-navy text-white p-2 rounded-full transition-colors z-10"
+                >
+                  <X size={24} />
+                </button>
+                <motion.img
+                  initial={{ scale: 0.9, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.9, opacity: 0 }}
+                  src={previewImage}
+                  alt="Preview"
+                  className="max-w-full max-h-full object-contain rounded-lg shadow-2xl"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

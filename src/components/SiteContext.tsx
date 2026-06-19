@@ -3,7 +3,7 @@ import { LucideIcon } from 'lucide-react';
 import { PRODUCTS } from '../data/products';
 import { CARS } from '../data/cars';
 import { db } from '../firebase';
-import { doc, onSnapshot, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, onSnapshot, setDoc, updateDoc, deleteField } from 'firebase/firestore';
 
 export interface ServiceItem {
   id: string;
@@ -120,6 +120,7 @@ export interface ReviewItem {
 
 export interface SiteConfig {
   logoUrl: string | null;
+  heroImages?: string[];
   heroImageUrl: string;
   heroTitle: string;
   heroSubtitle: string;
@@ -149,6 +150,8 @@ export interface SiteConfig {
   shopDescription?: string;
   adminProfileImage?: string;
   admins?: string[];
+  maintenanceMode?: boolean;
+  maintenanceMessage?: string;
 }
 
 const defaultServices: ServiceItem[] = [
@@ -241,6 +244,7 @@ const defaultVisaTypes: VisaTypeItem[] = [
 
 const defaultConfig: SiteConfig = {
   logoUrl: null,
+  heroImages: [],
   heroImageUrl: 'https://images.unsplash.com/photo-1512453979798-5ea266f8880c?q=80&w=2070&auto=format&fit=crop',
   heroTitle: 'Votre pont entre\nKinshasa\net Dubai',
   heroSubtitle: 'Voyage, visas, shopping de luxe et importation de véhicules. Nous facilitons toutes vos démarches avec professionnalisme et transparence.',
@@ -274,6 +278,8 @@ const defaultConfig: SiteConfig = {
   shopCoverImage: 'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?auto=format&fit=crop&q=80&w=2070',
   shopTitle: 'Boutique Express',
   shopDescription: 'Produits authentiques importés directement de Dubai.',
+  maintenanceMode: false,
+  maintenanceMessage: 'Le site est actuellement en maintenance. Nous serons de retour dans quelques instants !',
 };
 
 interface SiteContextType {
@@ -346,8 +352,15 @@ export function SiteProvider({ children }: { children: ReactNode }) {
   });
 
   useEffect(() => {
+    let currentConfig: SiteConfig = { ...config };
+
+    const updateState = () => {
+      setConfig({ ...currentConfig });
+      localStorage.setItem('siteConfig', JSON.stringify(currentConfig));
+    };
+
     const docRef = doc(db, 'settings', 'global');
-    const unsubscribe = onSnapshot(docRef, (docSnap) => {
+    const unsubscribeGlobal = onSnapshot(docRef, (docSnap) => {
       if (docSnap.exists()) {
         let firestoreConfig = docSnap.data() as SiteConfig;
         
@@ -355,35 +368,84 @@ export function SiteProvider({ children }: { children: ReactNode }) {
            firestoreConfig.contactWhatsapp = '+243 82 663 6212';
         }
         
-        // Ensure admins are merged properly if missing
         const mergedAdmins = firestoreConfig.admins?.length ? firestoreConfig.admins : ['mushitujacques3@gmail.com'];
-        const finalConfig = { ...firestoreConfig, admins: mergedAdmins };
+        firestoreConfig.admins = mergedAdmins;
         
-        setConfig(finalConfig);
-        localStorage.setItem('siteConfig', JSON.stringify(finalConfig));
+        currentConfig = { ...currentConfig, ...firestoreConfig };
+        updateState();
       } else {
-        // Only initialize it from local storage if the user explicitly has stored data that is not perfectly matching default
         const saved = localStorage.getItem('siteConfig');
         if (saved) {
-           setDoc(docRef, config).catch(console.error);
+           updateConfig(config).catch(console.error);
         }
       }
     }, (error) => {
-      console.error("Firestore snapshot error:", error);
+      console.error("Firestore global snapshot error:", error);
     });
 
-    return () => unsubscribe();
+    const collectionsToListen = [
+      'heroImages', 'cars', 'products', 'services', 'orders', 
+      'messages', 'transfers', 'reviews', 'announcements'
+    ];
+    
+    const unsubscribes = collectionsToListen.map(col => {
+      const ref = doc(db, 'settings', col);
+      return onSnapshot(ref, (docSnap) => {
+        if (docSnap.exists()) {
+           const data = col === 'heroImages' ? docSnap.data().images : docSnap.data().data;
+           (currentConfig as any)[col] = data || [];
+           updateState();
+        }
+      }, (error) => console.error(`${col} snapshot error:`, error));
+    });
+
+    return () => {
+      unsubscribeGlobal();
+      unsubscribes.forEach(unsub => unsub());
+    };
   }, []);
 
   const updateConfig = async (newConfig: Partial<SiteConfig>) => {
     const updated = { ...config, ...newConfig };
+    
     setConfig(updated);
     
     try {
+      const arrayFields = [
+        'heroImages', 'cars', 'products', 'services', 'orders', 
+        'messages', 'transfers', 'reviews', 'announcements'
+      ];
+      
+      const globalPayload = { ...updated };
+      
+      // Remove separated fields from the global payload
+      arrayFields.forEach(field => {
+        (globalPayload as any)[field] = deleteField();
+      });
+
+      // Check approximate size for global payload
+      const approxSize = new Blob([JSON.stringify(globalPayload)]).size;
+      if (approxSize > 1048500) {
+        import('react-hot-toast').then(({ default: toast }) => {
+          toast.error("La taille limite de la base de données globale est atteinte.");
+        });
+        return;
+      }
+
       const docRef = doc(db, 'settings', 'global');
-      await setDoc(docRef, updated, { merge: true });
+      await setDoc(docRef, globalPayload, { merge: true });
+
+      for (const field of arrayFields) {
+        if ((updated as any)[field] !== undefined) {
+          const payload = field === 'heroImages' ? { images: (updated as any)[field] } : { data: (updated as any)[field] };
+          await setDoc(doc(db, 'settings', field), payload, { merge: true });
+        }
+      }
     } catch (e) {
       console.error("Error updating config in firestore", e);
+      import('react-hot-toast').then(({ default: toast }) => {
+        toast.error("Erreur lors de la sauvegarde. Base de données peut-être trop volumineuse.");
+      });
     }
   };
 

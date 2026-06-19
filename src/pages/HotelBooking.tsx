@@ -4,6 +4,7 @@ import { Building2, Calendar, Users, MapPin, User, Mail, Phone } from 'lucide-re
 import { motion } from 'motion/react';
 import { useSiteConfig } from '../components/SiteContext';
 import { LazyImage } from '../components/LazyImage';
+import toast from 'react-hot-toast';
 
 export default function HotelBooking() {
   const { config, updateConfig } = useSiteConfig();
@@ -35,6 +36,7 @@ export default function HotelBooking() {
     });
     
     setSubmitted(true);
+    toast.success('Demande de réservation envoyée avec succès !');
   };
 
   const serviceInfo = config.services?.find(s => s.link === '/hotel-booking');

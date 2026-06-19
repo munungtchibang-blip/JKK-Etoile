@@ -5,6 +5,7 @@ import { Search, Loader2, Plane } from 'lucide-react';
 
 import { useSiteConfig } from '../components/SiteContext';
 import { LazyImage } from '../components/LazyImage';
+import toast from 'react-hot-toast';
 
 function FlightStatusWidget() {
   const [flightNumber, setFlightNumber] = useState('');
@@ -148,6 +149,7 @@ export default function Flights() {
     });
     
     setSubmitted(true);
+    toast.success('Demande de vol envoyée avec succès !');
     
     const message = `Bonjour, je souhaite réserver un vol de Kinshasa à Dubai pour le ${date} (${passengers} passager(s)). Nom: ${name}, Télephone: ${phone}`;
     const num = "243826636212";

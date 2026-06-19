@@ -4,6 +4,7 @@ import { useState, FormEvent, useEffect } from 'react';
 import { Upload, CheckCircle, Clock } from 'lucide-react';
 import { useSiteConfig } from '../components/SiteContext';
 import { LazyImage } from '../components/LazyImage';
+import toast from 'react-hot-toast';
 
 export default function Visas() {
   const { config, updateConfig } = useSiteConfig();
@@ -46,6 +47,7 @@ export default function Visas() {
     });
     
     setSubmitted(true);
+    toast.success('Demande de visa envoyée avec succès !');
     
     const message = `Bonjour, je souhaite faire une demande de ${visa?.name}${includeInsurance ? ' avec Assurance Voyage' : ''}. Nom: ${name}, Téléphone: ${phone}`;
     const num = "243826636212";
