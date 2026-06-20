@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import { useSiteConfig } from '../components/SiteContext';
 import { LazyImage } from '../components/LazyImage';
 import toast from 'react-hot-toast';
+import { sendAdminNotification } from '../lib/EmailNotifier';
 
 export default function MoneyTransfer() {
   const { config, updateConfig } = useSiteConfig();
@@ -48,6 +49,16 @@ export default function MoneyTransfer() {
       
       updateConfig({
         transfers: [newTransfer, ...(config.transfers || [])]
+      });
+      
+      sendAdminNotification(config.emailNotificationKey, 'Nouvelle Demande de Transfert', {
+        Client: newTransfer.client,
+        Telephone: newTransfer.phone,
+        Destinataire: newTransfer.receiverPhone,
+        Montant: newTransfer.amount,
+        Direction: newTransfer.direction,
+        Methode: newTransfer.method,
+        Date: newTransfer.date
       });
       
       const message = `Bonjour, je viens de faire une demande de transfert (Ref: ${transactionRef}).`;

@@ -110,9 +110,15 @@ export default function FloatingWhatsApp() {
     return () => clearInterval(interval);
   }, []);
 
-  const whatsappNumber = "243826636212";
+  const whatsappNumber = config.contactWhatsapp?.replace(/[^0-9]/g, '') || "243826636212";
 
   const getWelcomeMessage = () => {
+    // Check if the current page matches a service link and if there is a custom message
+    const matchingService = config.services?.find(s => s.link === location.pathname);
+    if (matchingService && matchingService.whatsappMessage) {
+      return matchingService.whatsappMessage;
+    }
+
     switch (location.pathname) {
       case '/flights': return "Bonjour, je souhaite avoir des informations sur les vols et billets d'avion.";
       case '/visas': return "Bonjour, je souhaite me renseigner sur les procédures de visa.";
@@ -126,7 +132,7 @@ export default function FloatingWhatsApp() {
 
   return (
     <motion.a
-      href={`https://wa.me/${whatsappNumber}?text=${defaultMessage}`}
+      href={`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${defaultMessage}`}
       target="_blank"
       rel="noopener noreferrer"
       className="fixed bottom-6 right-6 z-50 group flex items-center justify-center"

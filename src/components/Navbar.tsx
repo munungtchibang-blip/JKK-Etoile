@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import SettingsModal from './SettingsModal';
 import { useSiteConfig } from './SiteContext';
 import ThemeToggle from './ThemeToggle';
+import LanguageSwitcher from './LanguageSwitcher';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -67,18 +68,6 @@ export default function Navbar() {
     : "bg-navy/90 backdrop-blur-xl border-b border-gold/10 text-text shadow-sm";
   const logoColorClass = isHeroTransparent ? "text-text" : "text-gold";
 
-  const changeLanguage = (langCode: string) => {
-    const combo = document.querySelector('.goog-te-combo') as HTMLSelectElement;
-    if (combo) {
-      combo.value = langCode;
-      combo.dispatchEvent(new Event('change', { bubbles: true, cancelable: true }));
-    } else {
-      document.cookie = `googtrans=/fr/${langCode}; path=/`;
-      document.cookie = `googtrans=/fr/${langCode}; domain=.${window.location.hostname}; path=/`;
-      window.location.reload();
-    }
-  };
-
   // Prevent scrolling when mobile menu is open
   useEffect(() => {
     if (isOpen) {
@@ -100,6 +89,15 @@ export default function Navbar() {
           navClass
         )}
       >
+        {/* Exchange Rate Banner */}
+        <div className={cn(
+          "text-[10px] md:text-[11px] font-medium py-1.5 px-4 text-center tracking-widest uppercase border-b flex items-center justify-center gap-2 transition-colors duration-500",
+          isHeroTransparent ? "bg-navy/20 border-white/10 text-white/90 backdrop-blur-sm" : "bg-navy-800/80 border-gold/10 text-gold backdrop-blur-md"
+        )}>
+          <span className="opacity-80">Taux du Jour :</span>
+          <span className="font-bold">1 USD = {config.exchangeRate || 2250} FC</span>
+        </div>
+
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between py-4 md:py-5 min-h-[5rem] md:min-h-[6.5rem] transition-all duration-500">
             {/* Logo */}
@@ -255,15 +253,16 @@ export default function Navbar() {
 
               <div className={cn("h-6 w-px", isHeroTransparent ? "bg-text/30" : "bg-text/20")}></div>
 
+              <LanguageSwitcher />
               <ThemeToggle />
               <SettingsModal />
-              <div id="google_translate_element" className="hidden"></div>
             </div>
 
             {/* Mobile Menu Toggle */}
             <div className="flex lg:hidden items-center gap-2 sm:gap-4 z-50">
+              <LanguageSwitcher />
               <ThemeToggle />
-              <button 
+              <button  
                 onClick={() => setIsOpen(!isOpen)}
                 className={cn(
                   "p-2 rounded-full border transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gold",

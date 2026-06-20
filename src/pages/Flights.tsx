@@ -6,6 +6,7 @@ import { Search, Loader2, Plane } from 'lucide-react';
 import { useSiteConfig } from '../components/SiteContext';
 import { LazyImage } from '../components/LazyImage';
 import toast from 'react-hot-toast';
+import { sendAdminNotification } from '../lib/EmailNotifier';
 
 function FlightStatusWidget() {
   const [flightNumber, setFlightNumber] = useState('');
@@ -146,6 +147,14 @@ export default function Flights() {
     
     updateConfig({
       orders: [newOrder, ...(config.orders || [])]
+    });
+    
+    sendAdminNotification(config.emailNotificationKey, 'Nouvelle Demande de Vol', {
+      Client: newOrder.client,
+      Email: newOrder.email,
+      Telephone: newOrder.phone,
+      Service: newOrder.item,
+      Date: newOrder.date
     });
     
     setSubmitted(true);

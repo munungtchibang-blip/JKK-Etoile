@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import { useSiteConfig } from '../components/SiteContext';
 import { LazyImage } from '../components/LazyImage';
 import toast from 'react-hot-toast';
+import { sendAdminNotification } from '../lib/EmailNotifier';
 
 function FreightSimulator() {
   const [weight, setWeight] = useState<number>(0);
@@ -93,6 +94,14 @@ export default function CargoService() {
     
     updateConfig({
       orders: [newOrder, ...(config.orders || [])]
+    });
+    
+    sendAdminNotification(config.emailNotificationKey, 'Nouvelle Demande Expédition', {
+      Client: newOrder.client,
+      Email: newOrder.email,
+      Telephone: newOrder.phone,
+      Service: newOrder.item,
+      Date: newOrder.date
     });
     
     setSubmitted(true);

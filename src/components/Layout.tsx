@@ -3,6 +3,7 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import FloatingWhatsApp from './FloatingWhatsApp';
 import BackToTop from './BackToTop';
+import CurrencyConverter from './CurrencyConverter';
 import { motion, AnimatePresence } from 'motion/react';
 import { useEffect, Suspense } from 'react';
 import { useSiteConfig } from './SiteContext';
@@ -42,6 +43,7 @@ export default function Layout() {
       </main>
       <Footer />
       <FloatingWhatsApp />
+      <CurrencyConverter />
       <BackToTop />
     </div>
   );

@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, CheckCircle, ShieldCheck } from 'lucide-react';
 import { motion } from 'motion/react';
 import toast from 'react-hot-toast';
+import { useSiteConfig } from '../components/SiteContext';
+import { sendAdminNotification } from '../lib/EmailNotifier';
 
 const CARS = [
   { id: 1, brand: 'Toyota', model: 'Land Cruiser Prado', year: 2023, price: 45000, image: 'https://images.unsplash.com/photo-1590509653066-8a9d18db5469?q=80&w=1770&auto=format&fit=crop' },
@@ -16,6 +18,7 @@ export default function CarOrder() {
   const car = CARS.find(c => c.id === Number(id));
   const [submitted, setSubmitted] = useState(false);
   const [hasInsurance, setHasInsurance] = useState(false);
+  const { config } = useSiteConfig();
 
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
@@ -114,6 +117,14 @@ export default function CarOrder() {
           <form className="space-y-8" onSubmit={(e) => { 
               e.preventDefault(); 
               if (isNameValid && isPhoneValid && isEmailValid) {
+                  sendAdminNotification(config.emailNotificationKey, 'Nouvelle Demande Véhicule', {
+                    Client: name,
+                    Email: email,
+                    Telephone: phone,
+                    Service: `Véhicule: ${car?.brand} ${car?.model}`,
+                    Assurance: hasInsurance ? 'Oui' : 'Non',
+                    Total: formatPrice(totalPrice)
+                  });
                   setSubmitted(true);
                   toast.success('Commande confirmée avec succès !');
               }

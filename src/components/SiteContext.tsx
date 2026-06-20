@@ -13,6 +13,7 @@ export interface ServiceItem {
   link: string;
   content?: string;
   imageUrl?: string;
+  whatsappMessage?: string;
 }
 
 export interface ProductItem {
@@ -152,6 +153,8 @@ export interface SiteConfig {
   admins?: string[];
   maintenanceMode?: boolean;
   maintenanceMessage?: string;
+  exchangeRate?: number;
+  emailNotificationKey?: string;
 }
 
 const defaultServices: ServiceItem[] = [

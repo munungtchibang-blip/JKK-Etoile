@@ -3,6 +3,7 @@ import { useState, FormEvent } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSiteConfig } from '../components/SiteContext';
 import toast from 'react-hot-toast';
+import { sendAdminNotification } from '../lib/EmailNotifier';
 
 const FAQS = [
   {
@@ -64,6 +65,14 @@ export default function Contact() {
       const newMessages = [newMessage, ...(config.messages || [])];
       
       updateConfig({ messages: newMessages });
+      
+      sendAdminNotification(config.emailNotificationKey, 'Nouveau Message de Contact', {
+        Nom: name,
+        Email: email,
+        Telephone: phone,
+        Sujet: subject,
+        Message: message
+      });
 
       setIsSubmitting(false);
       setSubmitSuccess(true);

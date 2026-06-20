@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import { useSiteConfig } from '../components/SiteContext';
 import { LazyImage } from '../components/LazyImage';
 import toast from 'react-hot-toast';
+import { sendAdminNotification } from '../lib/EmailNotifier';
 
 export default function TravelInsurance() {
   const { config, updateConfig } = useSiteConfig();
@@ -32,6 +33,14 @@ export default function TravelInsurance() {
     
     updateConfig({
       orders: [newOrder, ...(config.orders || [])]
+    });
+    
+    sendAdminNotification(config.emailNotificationKey, 'Nouvelle Demande Assurance', {
+      Client: newOrder.client,
+      Email: newOrder.email,
+      Telephone: newOrder.phone,
+      Service: newOrder.item,
+      Date: newOrder.date
     });
     
     setSubmitted(true);

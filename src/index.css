@@ -80,3 +80,9 @@ html.text-size-xlarge {
   font-size: 125%;
 }
 
+/* Hide Google Translate UI elements */
+body { top: 0 !important; }
+.skiptranslate { display: none !important; }
+#goog-gt-tt { display: none !important; }
+.goog-te-banner-frame { display: none !important; }
+

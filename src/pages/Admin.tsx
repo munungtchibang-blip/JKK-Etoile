@@ -2298,6 +2298,55 @@ const getPendingCount = (id: string, config: any) => {
               className="bg-glass border border-gold-muted/20 p-6 rounded-lg space-y-6"
             >
               <h3 className="text-lg font-display text-gold">
+                Notifications Email (Web3Forms)
+              </h3>
+              <p className="text-sm text-text/70 mb-4">Créez une Access Key gratuite sur <a href="https://web3forms.com" target="_blank" rel="noreferrer" className="text-gold underline hover:text-[#d4b069]">Web3Forms</a> et copiez-la ici pour recevoir des emails lorsqu'un client soumet une demande ou un contact.</p>
+              <div>
+                <label className="text-[10px] text-text/90 font-medium uppercase tracking-widest block mb-2">
+                  Access Key (Clé API)
+                </label>
+                <input
+                  type="text"
+                  value={config.emailNotificationKey || ''}
+                  onChange={(e) => updateConfig({ emailNotificationKey: e.target.value })}
+                  className="w-full bg-navy border border-text/20 p-2 rounded text-sm text-text focus:outline-none focus:border-gold"
+                  placeholder="Ex: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+                />
+              </div>
+            </motion.div>
+
+            <motion.div
+              variants={{
+                hidden: { opacity: 0, scale: 0.98 },
+                show: { opacity: 1, scale: 1 },
+              }}
+              className="bg-glass border border-gold-muted/20 p-6 rounded-lg space-y-6"
+            >
+              <h3 className="text-lg font-display text-gold">
+                Taux de Change
+              </h3>
+              <div>
+                <label className="text-[10px] text-text/90 font-medium uppercase tracking-widest block mb-2">
+                  1 USD en CDF (Franc Congolais)
+                </label>
+                <input
+                  type="number"
+                  value={config.exchangeRate || 2250}
+                  onChange={(e) => updateConfig({ exchangeRate: parseFloat(e.target.value) || 2250 })}
+                  className="w-full bg-navy border border-text/20 p-2 rounded text-sm text-text focus:outline-none focus:border-gold"
+                  placeholder="Ex: 2250"
+                />
+              </div>
+            </motion.div>
+
+            <motion.div
+              variants={{
+                hidden: { opacity: 0, scale: 0.98 },
+                show: { opacity: 1, scale: 1 },
+              }}
+              className="bg-glass border border-gold-muted/20 p-6 rounded-lg space-y-6"
+            >
+              <h3 className="text-lg font-display text-gold">
                 Identité Visuelle
               </h3>
 
@@ -3221,6 +3270,19 @@ const getPendingCount = (id: string, config: any) => {
                         }}
                         rows={4}
                         placeholder="Contenu détaillé qui sera visible lorsque le client cliquera sur ce service..."
+                        className="w-full bg-navy border border-text/20 px-2 py-1.5 rounded text-xs text-text focus:outline-none focus:border-gold mb-4"
+                      />
+                      <label className="text-[10px] text-text/90 font-medium uppercase tracking-widest block mb-1">
+                        Message WhatsApp pré-rempli
+                      </label>
+                      <input
+                        value={svc.whatsappMessage || ''}
+                        onChange={(e) => {
+                          const svcs = [...config.services];
+                          svcs[i] = { ...svcs[i], whatsappMessage: e.target.value };
+                          updateConfig({ services: svcs });
+                        }}
+                        placeholder="Ex: Bonjour, je souhaite avoir plus de renseignements sur ce service..."
                         className="w-full bg-navy border border-text/20 px-2 py-1.5 rounded text-xs text-text focus:outline-none focus:border-gold"
                       />
                     </div>

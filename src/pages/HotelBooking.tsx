@@ -5,6 +5,7 @@ import { motion } from 'motion/react';
 import { useSiteConfig } from '../components/SiteContext';
 import { LazyImage } from '../components/LazyImage';
 import toast from 'react-hot-toast';
+import { sendAdminNotification } from '../lib/EmailNotifier';
 
 export default function HotelBooking() {
   const { config, updateConfig } = useSiteConfig();
@@ -33,6 +34,14 @@ export default function HotelBooking() {
     
     updateConfig({
       orders: [newOrder, ...(config.orders || [])]
+    });
+    
+    sendAdminNotification(config.emailNotificationKey, 'Nouvelle Réservation Hôtel', {
+      Client: newOrder.client,
+      Email: newOrder.email,
+      Telephone: newOrder.phone,
+      Service: newOrder.item,
+      Date: newOrder.date
     });
     
     setSubmitted(true);

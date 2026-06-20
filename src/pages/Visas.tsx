@@ -5,6 +5,7 @@ import { Upload, CheckCircle, Clock } from 'lucide-react';
 import { useSiteConfig } from '../components/SiteContext';
 import { LazyImage } from '../components/LazyImage';
 import toast from 'react-hot-toast';
+import { sendAdminNotification } from '../lib/EmailNotifier';
 
 export default function Visas() {
   const { config, updateConfig } = useSiteConfig();
@@ -44,6 +45,14 @@ export default function Visas() {
     
     updateConfig({
       orders: [newOrder, ...(config.orders || [])]
+    });
+    
+    sendAdminNotification(config.emailNotificationKey, 'Nouvelle Demande de Visa', {
+      Client: newOrder.client,
+      Email: newOrder.email,
+      Telephone: newOrder.phone,
+      Service: newOrder.item,
+      Date: newOrder.date
     });
     
     setSubmitted(true);
