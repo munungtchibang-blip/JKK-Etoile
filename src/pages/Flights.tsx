@@ -101,13 +101,12 @@ function FlightStatusWidget() {
 
 export default function Flights() {
   const [loading, setLoading] = useState(false);
-  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [isPageLoading, setIsPageLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const { config, updateConfig } = useSiteConfig();
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsPageLoading(false), 800);
-    return () => clearTimeout(timer);
+    // Artificial 800ms delay removed
   }, []);
 
   const [date, setDate] = useState('');

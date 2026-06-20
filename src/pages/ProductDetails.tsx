@@ -189,9 +189,12 @@ export default function ProductDetails() {
             <div className="flex flex-col sm:flex-row gap-4 mb-8">
                <button 
                  onClick={() => {
+                    const clientName = localStorage.getItem('jkk_user_name') || "Client WhatsApp";
+                    const clientEmail = localStorage.getItem('jkk_user_email') || "";
                     const newOrder = {
                       id: `#CMD-${String((config.orders?.length ? Math.max(...config.orders.map(o => parseInt(o.id.replace(/\D/g, "") || "0"))) : 0) + 1).padStart(3, "0")}`,
-                      client: "Client WhatsApp",
+                      client: clientName,
+                      email: clientEmail,
                       item: `Produit: ${product.name}`,
                       date: new Date().toLocaleDateString('fr-FR'),
                       status: "En cours",

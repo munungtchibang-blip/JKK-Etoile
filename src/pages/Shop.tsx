@@ -38,18 +38,15 @@ export default function Shop() {
 
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [checkoutStep, setCheckoutStep] = useState(0); // 0: cart, 1: payment, 2: success
-  const [isLoading, setIsLoading] = useState(true);
-  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setIsPageLoading(false), 800);
-    return () => clearTimeout(timer);
+    // Artificial 800ms delay removed
   }, []);
 
   useEffect(() => {
-    setIsLoading(true);
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
+    // Removed 800ms delay for fluid filtering
   }, [filter, sortPrice, minPrice, maxPrice, searchQuery]);
 
   let filteredProducts = filter === "all" ? [...(config.products || [])] : [];
@@ -649,7 +646,8 @@ export default function Shop() {
                 <div className="flex flex-col gap-3">
                   <button
                     onClick={() => {
-                      const clientName = "Client WhatsApp"; // Simplified, as we don't have a form, or we can use prompt
+                      const clientName = localStorage.getItem('jkk_user_name') || "Client WhatsApp";
+                      const clientEmail = localStorage.getItem('jkk_user_email') || "";
                       
                       const newOrder = {
                         id: `#CMD-${String((config.orders?.length ? Math.max(...config.orders.map(o => parseInt(o.id.replace(/\D/g, "") || "0"))) : 0) + 1).padStart(3, "0")}`,

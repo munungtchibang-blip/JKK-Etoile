@@ -108,6 +108,13 @@ export default function Dashboard() {
     );
   }
 
+  const isMyItem = (item: any) => {
+    const userNameFirst = userName.split(' ')[0].toLowerCase();
+    const isNameMatch = userNameFirst && String(item.client || '').toLowerCase().includes(userNameFirst);
+    const isEmailMatch = userEmail && String(item.email || '').toLowerCase() === userEmail.toLowerCase();
+    return isNameMatch || isEmailMatch;
+  };
+
   return (
     <div className="mx-auto max-w-7xl px-4 pt-[280px] pb-12 sm:px-6 lg:px-8 min-h-[80vh]">
       <div className="mb-12 flex flex-col md:flex-row md:items-center justify-between gap-6 border-b border-gold-muted pb-8">
@@ -177,8 +184,8 @@ export default function Dashboard() {
                 <h2 className="text-[13px] uppercase tracking-[1px] font-semibold text-gold">Commandes Boutique & Services</h2>
               </div>
               <div className="divide-y divide-gold-muted/30">
-                {config.orders && config.orders.length > 0 ? (
-                  config.orders.filter(o => String(o.client || '').includes(userName.split(' ')[0]) || true).slice(0, 5).map(order => (
+                {config.orders && config.orders.filter(o => isMyItem(o) && !o.item?.toLowerCase().includes('visa') && !o.item?.toLowerCase().includes('véhicule') && !o.item?.toLowerCase().includes('jeep') && !o.item?.toLowerCase().includes('voiture')).length > 0 ? (
+                  config.orders.filter(o => isMyItem(o) && !o.item?.toLowerCase().includes('visa') && !o.item?.toLowerCase().includes('véhicule') && !o.item?.toLowerCase().includes('jeep') && !o.item?.toLowerCase().includes('voiture')).slice(0, 5).map(order => (
                     <div key={order.id} className="p-6 flex flex-col gap-4 hover:bg-white/5 transition-colors">
                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div>
@@ -220,8 +227,8 @@ export default function Dashboard() {
                 <h2 className="text-[13px] uppercase tracking-[1px] font-semibold text-gold">Mes Transferts d'Argent</h2>
               </div>
               <div className="divide-y divide-gold-muted/30">
-                {config.transfers && config.transfers.length > 0 ? (
-                  config.transfers.filter(t => String(t.client || '').includes(userName.split(' ')[0]) || true).map(transfer => (
+                {config.transfers && config.transfers.filter(t => isMyItem(t)).length > 0 ? (
+                  config.transfers.filter(t => isMyItem(t)).map(transfer => (
                     <div key={transfer.id} className="p-6 flex flex-col gap-4 hover:bg-white/5 transition-colors">
                       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
                         <div>
@@ -269,22 +276,37 @@ export default function Dashboard() {
                <h2 className="text-[13px] uppercase tracking-[1px] font-semibold text-gold">Demandes de Visa</h2>
              </div>
              <div className="divide-y divide-gold-muted/30">
-               <div className="p-6 flex flex-col md:flex-row md:items-center justify-between gap-6 hover:bg-white/5 transition-colors">
-                 <div>
-                   <div className="text-text text-sm font-light mb-1">KD-VS-9842</div>
-                   <div className="text-[11px] uppercase tracking-wider text-text/90 font-medium">Visa Touriste - 30 Jours (Marc Kabamba)</div>
-                 </div>
-                 <div className="flex items-center gap-4">
-                   <span className="border border-white/50 text-text/90 font-medium px-3 py-1 text-[10px] uppercase tracking-widest font-semibold bg-navy-800">En cours</span>
-                   <button
-                    onClick={() => generateInvoicePDF(userName, userEmail || 'Email non fourni', 'KD-VS-9842', new Date().toLocaleDateString(), 'Visa Touriste - 30 Jours (Marc Kabamba)', "Frais d'agence non définis", 'En cours')}
-                    className="p-1.5 text-gold hover:text-white transition-colors border border-gold-muted/30 hover:bg-gold/10 rounded-full"
-                    title="Télécharger la facture"
-                   >
-                    <Download size={14} />
-                   </button>
-                 </div>
-               </div>
+               {config.orders && config.orders.filter(o => o.item?.toLowerCase().includes('visa') && isMyItem(o)).length > 0 ? (
+                 config.orders.filter(o => o.item?.toLowerCase().includes('visa') && isMyItem(o)).map(order => (
+                   <div key={order.id} className="p-6 flex flex-col gap-4 hover:bg-white/5 transition-colors">
+                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                       <div>
+                         <div className="text-text text-sm font-light mb-1">{order.id}</div>
+                         <div className="text-[11px] uppercase tracking-wider text-text/90 font-medium">{order.item}</div>
+                       </div>
+                       <div className="flex items-center gap-4">
+                         <span className={`border border-white/50 text-text/90 font-medium px-3 py-1 text-[10px] uppercase tracking-widest font-semibold ${order.statusColor || 'bg-navy-800'}`}>{order.status}</span>
+                         <button
+                           onClick={() => generateInvoicePDF(userName, userEmail || 'Email non fourni', order.id, order.date || new Date().toLocaleDateString(), order.item, "Frais d'agence", order.status)}
+                           className="p-1.5 text-gold hover:text-white transition-colors border border-gold-muted/30 hover:bg-gold/10 rounded-full"
+                           title="Télécharger la facture"
+                         >
+                           <Download size={14} />
+                         </button>
+                       </div>
+                     </div>
+                     {order.adminReply && (
+                        <div className="bg-navy-800/50 p-4 border border-gold/20 rounded-md mt-2 relative overflow-hidden">
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gold"></div>
+                          <span className="text-[10px] uppercase tracking-widest text-gold font-bold block mb-1">Réponse de l'administration</span>
+                          <p className="text-sm text-text/90 font-light whitespace-pre-wrap">{order.adminReply}</p>
+                        </div>
+                      )}
+                   </div>
+                 ))
+               ) : (
+                 <div className="p-8 text-center text-text/60 text-sm">Aucune demande de visa en cours.</div>
+               )}
              </div>
            </div>
           )}
@@ -294,9 +316,41 @@ export default function Dashboard() {
              <div className="border-b border-gold-muted px-6 py-5">
                <h2 className="text-[13px] uppercase tracking-[1px] font-semibold text-gold">Importation Véhicules</h2>
              </div>
-             <div className="p-16 text-center text-text/90 font-medium">
-                <Car className="mx-auto mb-6 h-12 w-12 text-gold opacity-50" />
-                <p className="text-[11px] uppercase tracking-widest font-light">Aucune importation de véhicule en cours.</p>
+             <div className="divide-y divide-gold-muted/30">
+               {config.orders && config.orders.filter(o => (o.item?.toLowerCase().includes('véhicule') || o.item?.toLowerCase().includes('jeep') || o.item?.toLowerCase().includes('voiture')) && isMyItem(o)).length > 0 ? (
+                 config.orders.filter(o => (o.item?.toLowerCase().includes('véhicule') || o.item?.toLowerCase().includes('jeep') || o.item?.toLowerCase().includes('voiture')) && isMyItem(o)).map(order => (
+                   <div key={order.id} className="p-6 flex flex-col gap-4 hover:bg-white/5 transition-colors">
+                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                       <div>
+                         <div className="text-text text-sm font-light mb-1">{order.id}</div>
+                         <div className="text-[11px] uppercase tracking-wider text-text/90 font-medium">{order.item}</div>
+                       </div>
+                       <div className="flex items-center gap-4">
+                         <span className={`border border-white/50 text-text/90 font-medium px-3 py-1 text-[10px] uppercase tracking-widest font-semibold ${order.statusColor || 'bg-navy-800'}`}>{order.status}</span>
+                         <button
+                           onClick={() => generateInvoicePDF(userName, userEmail || 'Email non fourni', order.id, order.date || new Date().toLocaleDateString(), order.item, "Importation", order.status)}
+                           className="p-1.5 text-gold hover:text-white transition-colors border border-gold-muted/30 hover:bg-gold/10 rounded-full"
+                           title="Télécharger la facture"
+                         >
+                           <Download size={14} />
+                         </button>
+                       </div>
+                     </div>
+                     {order.adminReply && (
+                        <div className="bg-navy-800/50 p-4 border border-gold/20 rounded-md mt-2 relative overflow-hidden">
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-gold"></div>
+                          <span className="text-[10px] uppercase tracking-widest text-gold font-bold block mb-1">Réponse de l'administration</span>
+                          <p className="text-sm text-text/90 font-light whitespace-pre-wrap">{order.adminReply}</p>
+                        </div>
+                      )}
+                   </div>
+                 ))
+               ) : (
+                 <div className="p-16 text-center text-text/90 font-medium">
+                    <Car className="mx-auto mb-6 h-12 w-12 text-gold opacity-50" />
+                    <p className="text-[11px] uppercase tracking-widest font-light">Aucune importation de véhicule en cours.</p>
+                 </div>
+               )}
              </div>
            </div>
           )}

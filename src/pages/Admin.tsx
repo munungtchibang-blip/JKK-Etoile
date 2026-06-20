@@ -2331,8 +2331,8 @@ const getPendingCount = (id: string, config: any) => {
                 </label>
                 <input
                   type="number"
-                  value={config.exchangeRate || 2250}
-                  onChange={(e) => updateConfig({ exchangeRate: parseFloat(e.target.value) || 2250 })}
+                  value={config.exchangeRate || ''}
+                  onChange={(e) => updateConfig({ exchangeRate: parseFloat(e.target.value) || 0 })}
                   className="w-full bg-navy border border-text/20 p-2 rounded text-sm text-text focus:outline-none focus:border-gold"
                   placeholder="Ex: 2250"
                 />

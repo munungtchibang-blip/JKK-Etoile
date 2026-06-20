@@ -81,13 +81,10 @@ export default function Cars() {
     setTouchEnd(0);
   };
 
-  const [isCarsLoading, setIsCarsLoading] = useState(true);
+  const [isCarsLoading, setIsCarsLoading] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsCarsLoading(false);
-    }, 1500);
-    return () => clearTimeout(timer);
+    // Artificial 1500ms delay removed
   }, []);
 
   const toggleCarDetails = (id: number) => {
@@ -848,10 +845,14 @@ export default function Cars() {
                       const message = `Bonjour, je souhaite passer commande pour les véhicules suivants:\\n\\n${itemsText}`;
                       window.open(`https://wa.me/${num}?text=${encodeURIComponent(message)}`, '_blank');
                       
+                      const clientName = localStorage.getItem('jkk_user_name') || "Client WhatsApp";
+                      const clientEmail = localStorage.getItem('jkk_user_email') || "";
+                      
                       cart.forEach(car => {
                         const newOrder = {
                           id: `#CMD-${String((config.orders?.length ? Math.max(...config.orders.map(o => parseInt(o.id.replace(/\D/g, "") || "0"))) : 0) + 1).padStart(3, "0")}`,
-                          client: "Client WhatsApp",
+                          client: clientName,
+                          email: clientEmail,
                           item: `Véhicule: ${car.brand} ${car.model}`,
                           date: new Date().toLocaleDateString('fr-FR'),
                           status: "En cours",

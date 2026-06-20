@@ -55,7 +55,7 @@ export default function CurrencyConverter() {
                   type="number" 
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full bg-navy/50 border border-gold-muted/20 rounded p-3 text-white focus:outline-none focus:border-gold transition-colors text-xl font-display"
+                  className="w-full bg-navy/50 border border-gold-muted/20 rounded p-3 text-text focus:outline-none focus:border-gold transition-colors text-xl font-display"
                   min="0"
                 />
               </div>
