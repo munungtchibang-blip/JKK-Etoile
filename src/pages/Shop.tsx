@@ -701,7 +701,7 @@ export default function Shop() {
       {cartCount > 0 && (
         <button
           onClick={() => setIsCartOpen(true)}
-          className="fixed bottom-6 right-6 z-50 flex items-center justify-center p-4 bg-gold rounded-full shadow-lg hover:bg-[#d4b069] transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-navy shadow-[0_4px_20px_rgba(212,176,105,0.3)]"
+          className="fixed bottom-[100px] right-6 z-50 flex items-center justify-center p-4 bg-gold rounded-full shadow-lg hover:bg-[#d4b069] transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-navy shadow-[0_4px_20px_rgba(212,176,105,0.3)]"
           aria-label="Ouvrir le panier"
         >
           <ShoppingCart size={24} className="text-[#0f172a]" />

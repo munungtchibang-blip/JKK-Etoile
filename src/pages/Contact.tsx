@@ -35,16 +35,17 @@ export default function Contact() {
   const [submitSuccess, setSubmitSuccess] = useState(false);
   const { config, updateConfig } = useSiteConfig();
 
-  const isNameValid = name.trim().length >= 10;
-  const isPhoneValid = /^\+?[\d\s-]{8,}$/.test(phone);
+  const isNameValid = name.trim().length >= 2;
+  const isPhoneValid = phone.trim().length >= 8;
   const isEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-  const isMessageValid = message.trim().length >= 10;
+  const isMessageValid = message.trim().length >= 3;
   const [subject, setSubject] = useState('Autre');
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
     if (!isNameValid || !isPhoneValid || !isEmailValid || !isMessageValid) {
        setTouched({ name: true, phone: true, email: true, message: true });
+       toast.error("Veuillez remplir correctement tous les champs requis.");
        return;
     }
 
@@ -188,7 +189,7 @@ export default function Contact() {
                   onBlur={() => setTouched({ ...touched, name: true })}
                   className={`w-full rounded-lg border px-4 py-3 text-sm font-light text-text outline-none transition-all placeholder:text-text/30 ${getInputClass('name', isNameValid)}`} 
                 />
-                {!isNameValid && touched.name && <span className="text-red-500 text-[10px] uppercase tracking-wider absolute -bottom-5 left-4 text-nowrap">Le nom doit comporter au moins 10 caractères.</span>}
+                {!isNameValid && touched.name && <span className="text-red-500 text-[10px] uppercase tracking-wider absolute -bottom-5 left-4 text-nowrap">Nom invalide.</span>}
               </div>
               <div className="flex flex-col gap-2 relative">
                 <label className="text-[10px] uppercase text-gold tracking-[1.5px] ml-4 font-semibold">Téléphone</label>
@@ -201,7 +202,7 @@ export default function Contact() {
                   onBlur={() => setTouched({ ...touched, phone: true })}
                   className={`w-full rounded-lg border px-4 py-3 text-sm font-light text-text outline-none transition-all placeholder:text-text/30 ${getInputClass('phone', isPhoneValid)}`} 
                 />
-                {!isPhoneValid && touched.phone && <span className="text-red-500 text-[10px] uppercase tracking-wider absolute -bottom-5 left-4">Format de téléphone invalide</span>}
+                {!isPhoneValid && touched.phone && <span className="text-red-500 text-[10px] uppercase tracking-wider absolute -bottom-5 left-4">Téléphone invalide</span>}
               </div>
             </div>
             
@@ -216,7 +217,7 @@ export default function Contact() {
                 onBlur={() => setTouched({ ...touched, email: true })}
                 className={`w-full rounded-lg border px-4 py-3 text-sm font-light text-text outline-none transition-all placeholder:text-text/30 ${getInputClass('email', isEmailValid)}`} 
               />
-              {!isEmailValid && touched.email && <span className="text-red-500 text-[10px] uppercase tracking-wider absolute -bottom-5 left-4">Adresse e-mail invalide.</span>}
+              {!isEmailValid && touched.email && <span className="text-red-500 text-[10px] uppercase tracking-wider absolute -bottom-5 left-4">E-mail invalide.</span>}
             </div>
             
             <div className="flex flex-col gap-2 relative mt-8">
@@ -245,7 +246,7 @@ export default function Contact() {
                 onBlur={() => setTouched({ ...touched, message: true })}
                 className={`w-full rounded-lg border px-4 py-3 text-sm font-light text-text outline-none resize-none transition-all placeholder:text-text/30 ${getInputClass('message', isMessageValid)}`}
               ></textarea>
-              {!isMessageValid && touched.message && <span className="text-red-500 text-[10px] uppercase tracking-wider absolute -bottom-5 left-4">Le message doit contenir au moins 10 caractères.</span>}
+              {!isMessageValid && touched.message && <span className="text-red-500 text-[10px] uppercase tracking-wider absolute -bottom-5 left-4">Message trop court.</span>}
             </div>
 
             <button 

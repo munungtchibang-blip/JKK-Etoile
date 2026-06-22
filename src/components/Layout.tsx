@@ -2,7 +2,6 @@ import { Outlet, useLocation, useOutlet } from 'react-router-dom';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import FloatingWhatsApp from './FloatingWhatsApp';
-import BackToTop from './BackToTop';
 import CurrencyConverter from './CurrencyConverter';
 import { motion, AnimatePresence } from 'motion/react';
 import { useEffect, Suspense } from 'react';
@@ -44,7 +43,6 @@ export default function Layout() {
       <Footer />
       <FloatingWhatsApp />
       <CurrencyConverter />
-      <BackToTop />
     </div>
   );
 }

@@ -967,7 +967,7 @@ export default function Cars() {
       {cart.length > 0 && (
         <button
           onClick={() => setIsCartOpen(true)}
-          className="fixed bottom-6 right-6 z-[90] flex items-center justify-center p-4 bg-gold rounded-full shadow-[0_4px_20px_rgba(212,176,105,0.3)] hover:bg-[#d4b069] transition-transform hover:scale-105"
+          className="fixed bottom-[100px] right-6 z-[90] flex items-center justify-center p-4 bg-gold rounded-full shadow-[0_4px_20px_rgba(212,176,105,0.3)] hover:bg-[#d4b069] transition-transform hover:scale-105"
         >
           <Package size={24} className="text-[#0f172a]" />
           <span className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white border-2 border-navy">

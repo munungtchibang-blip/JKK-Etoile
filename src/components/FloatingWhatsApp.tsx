@@ -1,4 +1,4 @@
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, X } from 'lucide-react';
 import { useSiteConfig } from './SiteContext';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
@@ -8,6 +8,7 @@ export default function FloatingWhatsApp() {
   const { config } = useSiteConfig();
   const [isOnline, setIsOnline] = useState(false);
   const [currentTimeStr, setCurrentTimeStr] = useState("");
+  const [showOfflineBanner, setShowOfflineBanner] = useState(false);
   const location = useLocation();
 
   const audioCtxRef = useRef<AudioContext | null>(null);
@@ -100,6 +101,9 @@ export default function FloatingWhatsApp() {
         online = currentHourWAT >= 9 && currentHourWAT < 13;
       }
       setIsOnline(online);
+      if (!online) {
+        setTimeout(() => setShowOfflineBanner(true), 2000);
+      }
       
       const timeStr = `${currentHourWAT.toString().padStart(2, '0')}:${currentMinute.toString().padStart(2, '0')} (Kinshasa)`;
       setCurrentTimeStr(timeStr);
@@ -131,19 +135,20 @@ export default function FloatingWhatsApp() {
   const defaultMessage = encodeURIComponent(getWelcomeMessage());
 
   return (
-    <motion.a
-      href={`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${defaultMessage}`}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="fixed bottom-6 right-6 z-50 group flex items-center justify-center"
-      aria-label="Contactez-nous sur WhatsApp"
-      whileHover={{ scale: 1.15 }}
-      whileTap={{ scale: 0.95 }}
-      transition={{ type: "spring", stiffness: 400, damping: 17 }}
-      onMouseEnter={playHoverSound}
-      onClick={playClickSound}
-    >
-      <div className="absolute -top-1 -right-1 z-10 flex h-4 w-4">
+    <div className="fixed bottom-6 right-6 z-50 flex items-center justify-end pointer-events-none">
+      <motion.a
+        href={`https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${defaultMessage}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="group flex items-center justify-center pointer-events-auto"
+        aria-label="Contactez-nous sur WhatsApp"
+        whileHover={{ scale: 1.15 }}
+        whileTap={{ scale: 0.95 }}
+        transition={{ type: "spring", stiffness: 400, damping: 17 }}
+        onMouseEnter={playHoverSound}
+        onClick={playClickSound}
+      >
+        <div className="absolute -top-1 -right-1 z-10 flex h-4 w-4">
         <AnimatePresence mode="wait">
           {isOnline ? (
             <motion.div 
@@ -190,5 +195,6 @@ export default function FloatingWhatsApp() {
         <MessageCircle size={32} />
       </span>
     </motion.a>
+    </div>
   );
 }

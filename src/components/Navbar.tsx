@@ -65,7 +65,7 @@ export default function Navbar() {
   const isHeroTransparent = location.pathname === '/' && !scrolled && !isOpen;
   const navClass = isHeroTransparent 
     ? "bg-navy/0 text-text border-b border-transparent" 
-    : "bg-navy/90 backdrop-blur-xl border-b border-gold/10 text-text shadow-sm";
+    : "bg-navy/60 backdrop-blur-2xl border-b border-gold/10 text-text shadow-sm";
   const logoColorClass = isHeroTransparent ? "text-text" : "text-gold";
 
   // Prevent scrolling when mobile menu is open
@@ -99,7 +99,7 @@ export default function Navbar() {
         </div>
 
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between py-4 md:py-5 min-h-[5rem] md:min-h-[6.5rem] transition-all duration-500">
+          <div className={cn("flex items-center justify-between transition-all duration-500", scrolled ? "py-2 md:py-3 min-h-[4rem] md:min-h-[5rem]" : "py-4 md:py-5 min-h-[5rem] md:min-h-[6.5rem]")}>
             {/* Logo */}
             <Link to="/" className="flex items-center gap-3 group z-50 shrink-0 max-w-[60vw]" onClick={() => setIsOpen(false)}>
               {config.logoUrl ? (
