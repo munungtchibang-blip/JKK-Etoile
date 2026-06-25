@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Menu, X, User, Search as SearchIcon, ChevronDown, ShieldCheck, Globe } from 'lucide-react';
+import { Menu, X, User, Search as SearchIcon, ChevronDown, ShieldCheck, Globe, ShoppingCart } from 'lucide-react';
 import { NAV_ITEMS } from '../lib/constants';
 import { cn } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
@@ -8,6 +8,7 @@ import SettingsModal from './SettingsModal';
 import { useSiteConfig } from './SiteContext';
 import ThemeToggle from './ThemeToggle';
 import LanguageSwitcher from './LanguageSwitcher';
+import { useCart } from './CartContext';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -18,6 +19,7 @@ export default function Navbar() {
   const location = useLocation();
   const navigate = useNavigate();
   const { config } = useSiteConfig();
+  const { cartCount, setIsCartOpen } = useCart();
 
   useEffect(() => {
     // Force reset on route change immediately
@@ -37,8 +39,8 @@ export default function Navbar() {
     };
   }, [location.pathname]);
 
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSearch = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (searchQuery.trim()) {
       navigate(`/shop?q=${encodeURIComponent(searchQuery)}`);
       setSearchQuery('');
@@ -63,10 +65,7 @@ export default function Navbar() {
   });
 
   const isHeroTransparent = location.pathname === '/' && !scrolled && !isOpen;
-  const navClass = isHeroTransparent 
-    ? "bg-navy/0 text-text border-b border-transparent" 
-    : "bg-navy/60 backdrop-blur-2xl border-b border-gold/10 text-text shadow-sm";
-  const logoColorClass = isHeroTransparent ? "text-text" : "text-gold";
+  const logoColorClass = isHeroTransparent ? "text-white" : "text-gold";
 
   // Prevent scrolling when mobile menu is open
   useEffect(() => {
@@ -84,30 +83,22 @@ export default function Navbar() {
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-        className={cn(
-          "fixed top-0 inset-x-0 z-[100] transition-colors duration-500",
-          navClass
-        )}
+        className="fixed top-0 inset-x-0 z-[100] transition-all duration-500 pointer-events-none"
       >
-        {/* Exchange Rate Banner */}
-        <div className={cn(
-          "text-[10px] md:text-[11px] font-medium py-1.5 px-4 text-center tracking-widest uppercase border-b flex items-center justify-center gap-2 transition-colors duration-500",
-          isHeroTransparent ? "bg-navy/20 border-white/10 text-white/90 backdrop-blur-sm" : "bg-navy-800/80 border-gold/10 text-gold backdrop-blur-md"
-        )}>
-          <span className="opacity-80">Taux du Jour :</span>
-          <span className="font-bold">1 USD = {config.exchangeRate || 2250} FC</span>
-        </div>
-
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className={cn("flex items-center justify-between transition-all duration-500", scrolled ? "py-2 md:py-3 min-h-[4rem] md:min-h-[5rem]" : "py-4 md:py-5 min-h-[5rem] md:min-h-[6.5rem]")}>
+        <div className="pointer-events-auto w-full transition-all duration-500">
+          <div className={cn(
+            "flex items-center justify-between transition-all duration-500 rounded-none",
+            scrolled ? "py-2 px-6 md:px-8 min-h-[3.5rem] shadow-lg" : "py-3 px-6 md:px-8 min-h-[4.5rem] shadow-sm",
+            isHeroTransparent ? "bg-navy/10 backdrop-blur-sm border-transparent shadow-[0_4px_30px_rgba(0,0,0,0.1)]" : "bg-navy/95 backdrop-blur-xl border-b border-gold/20 shadow-lg"
+          )}>
             {/* Logo */}
-            <Link to="/" className="flex items-center gap-3 group z-50 shrink-0 max-w-[60vw]" onClick={() => setIsOpen(false)}>
+            <Link to="/" className="flex items-center gap-3 group z-50 shrink-0 max-w-[50vw]" onClick={() => setIsOpen(false)}>
               {config.logoUrl ? (
                 <div className="flex items-center justify-start transition-transform duration-500 group-hover:scale-105">
                   <img 
                     src={config.logoUrl} 
                     alt="Logo" 
-                    className={cn("w-auto h-auto object-contain transition-all duration-500", scrolled ? "max-h-12 md:max-h-16 lg:max-h-20" : "max-h-16 md:max-h-20 lg:max-h-28")} 
+                    className={cn("w-auto h-auto object-contain transition-all duration-500", scrolled ? "max-h-8 md:max-h-10 lg:max-h-12" : "max-h-12 md:max-h-14 lg:max-h-16")} 
                   />
                 </div>
               ) : (
@@ -129,15 +120,15 @@ export default function Navbar() {
                   {item.subMenu ? (
                     <button className={cn("flex items-center gap-1.5 text-[15px] md:text-[16px] uppercase tracking-[1.5px] font-semibold group transition-colors duration-300", 
                       item.subMenu.some(sub => location.pathname === sub.href) 
-                        ? (isHeroTransparent ? "text-text" : "text-gold") 
-                        : (isHeroTransparent ? "text-text/90 hover:text-text" : "text-text/90 hover:text-gold")
+                        ? (isHeroTransparent ? "text-white drop-shadow-md" : "text-gold") 
+                        : (isHeroTransparent ? "text-white/95 hover:text-white drop-shadow-md" : "text-text/90 hover:text-gold")
                     )}>
                       {item.label}
                       <ChevronDown size={14} className={cn("transition-transform duration-300 transform", hoveredNav === item.label ? "rotate-180" : "")} />
                       <span className={cn(
                         "absolute bottom-[calc(50%-14px)] left-0 w-full h-[1.5px] transform origin-left transition-transform duration-300 group-hover:scale-x-100",
                         item.subMenu.some(sub => location.pathname === sub.href) ? "scale-x-100" : "scale-x-0",
-                        isHeroTransparent ? "bg-text" : "bg-gold"
+                        isHeroTransparent ? "bg-white shadow-[0_2px_4px_rgba(0,0,0,0.5)]" : "bg-gold"
                       )} />
                     </button>
                   ) : (
@@ -145,15 +136,15 @@ export default function Navbar() {
                       to={item.href}
                       className={cn("relative text-[15px] md:text-[16px] uppercase tracking-[1.5px] font-semibold group transition-colors duration-300", 
                         location.pathname === item.href 
-                          ? (isHeroTransparent ? "text-text" : "text-gold") 
-                          : (isHeroTransparent ? "text-text/90 hover:text-text" : "text-text/90 hover:text-gold")
+                          ? (isHeroTransparent ? "text-white drop-shadow-md" : "text-gold") 
+                          : (isHeroTransparent ? "text-white/95 hover:text-white drop-shadow-md" : "text-text/90 hover:text-gold")
                       )}
                     >
                       {item.label}
                       <span className={cn(
                         "absolute -bottom-1 left-0 w-full h-[2px] transform origin-left transition-transform duration-300",
                         location.pathname === item.href ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100",
-                        isHeroTransparent ? "bg-text" : "bg-gold"
+                        isHeroTransparent ? "bg-white shadow-[0_2px_4px_rgba(0,0,0,0.5)]" : "bg-gold"
                       )} />
                     </Link>
                   )}
@@ -219,7 +210,7 @@ export default function Navbar() {
                           onChange={(e) => setSearchQuery(e.target.value)}
                           className={cn(
                             "w-full bg-transparent border-b py-1.5 px-2 text-[13px] focus:outline-none transition-colors",
-                            isHeroTransparent ? "border-text/50 text-text focus:border-text placeholder:text-text/60" : "border-text/30 text-text focus:border-gold placeholder:text-text/50"
+                            isHeroTransparent ? "border-white/50 text-white focus:border-white placeholder:text-white/60" : "border-text/30 text-text focus:border-gold placeholder:text-text/50"
                           )}
                         />
                       </form>
@@ -227,17 +218,23 @@ export default function Navbar() {
                   )}
                 </AnimatePresence>
                 <button 
-                  onClick={() => setIsSearchOpen(!isSearchOpen)}
-                  className={cn("p-2 transition-transform duration-300 hover:scale-110", isHeroTransparent ? "text-text" : "text-text/90 hover:text-gold")}
+                  onClick={() => {
+                    if (isSearchOpen && searchQuery.trim()) {
+                      handleSearch();
+                    } else {
+                      setIsSearchOpen(!isSearchOpen);
+                    }
+                  }}
+                  className={cn("p-2 transition-transform duration-300 hover:scale-110", isHeroTransparent ? "text-white drop-shadow-md" : "text-text/90 hover:text-gold")}
                   aria-label="Search"
                 >
-                  {isSearchOpen ? <X size={20} /> : <SearchIcon size={20} />}
+                  {isSearchOpen && !searchQuery.trim() ? <X size={20} /> : <SearchIcon size={20} />}
                 </button>
               </div>
 
               <Link
                 to="/dashboard"
-                className={cn("p-2 transition-transform duration-300 hover:scale-110", isHeroTransparent ? "text-text hover:text-text/80" : "text-text/90 hover:text-gold")}
+                className={cn("p-2 transition-transform duration-300 hover:scale-110", isHeroTransparent ? "text-white hover:text-white/80 drop-shadow-md" : "text-text/90 hover:text-gold")}
                 title="Espace Client"
               >
                 <User size={20} />
@@ -245,14 +242,32 @@ export default function Navbar() {
 
               <Link
                 to="/admin"
-                className={cn("p-2 transition-transform duration-300 hover:scale-110", isHeroTransparent ? "text-text hover:text-text/80" : "text-text/90 hover:text-gold")}
+                className={cn("p-2 transition-transform duration-300 hover:scale-110", isHeroTransparent ? "text-white hover:text-white/80 drop-shadow-md" : "text-text/90 hover:text-gold")}
                 title="Administration"
               >
                 <ShieldCheck size={20} />
               </Link>
 
-              <div className={cn("h-6 w-px", isHeroTransparent ? "bg-text/30" : "bg-text/20")}></div>
+              <div className={cn("h-6 w-px", isHeroTransparent ? "bg-white/40 shadow-sm" : "bg-text/20")}></div>
 
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsCartOpen(true);
+                }}
+                className={cn(
+                  "p-2 transition-all duration-300 hover:scale-110 relative rounded-full group",
+                  isHeroTransparent ? "text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)] drop-shadow-md" : "text-text/90 hover:text-gold hover:bg-gold/5 hover:drop-shadow-[0_0_8px_rgba(212,176,105,0.6)]"
+                )}
+                title="Panier"
+              >
+                <ShoppingCart size={20} className="transition-all duration-300" />
+                {cartCount > 0 && (
+                  <span className="absolute top-0 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white border border-navy shadow-sm group-hover:scale-110 transition-transform duration-300">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
               <LanguageSwitcher />
               <ThemeToggle />
               <SettingsModal />
@@ -260,6 +275,24 @@ export default function Navbar() {
 
             {/* Mobile Menu Toggle */}
             <div className="flex lg:hidden items-center gap-2 sm:gap-4 z-50">
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  setIsCartOpen(true);
+                }}
+                className={cn(
+                  "p-1.5 transition-all duration-300 hover:scale-110 relative rounded-full group",
+                  isHeroTransparent ? "text-white hover:drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]" : "text-text/90 hover:text-gold hover:bg-gold/5 hover:drop-shadow-[0_0_8px_rgba(212,176,105,0.6)]"
+                )}
+                title="Panier"
+              >
+                <ShoppingCart size={20} className="transition-all duration-300" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white border border-navy shadow-sm group-hover:scale-110 transition-transform duration-300">
+                    {cartCount}
+                  </span>
+                )}
+              </button>
               <LanguageSwitcher />
               <ThemeToggle />
               <button  
@@ -269,7 +302,7 @@ export default function Navbar() {
                   isOpen 
                     ? "border-transparent bg-text/10 text-text rotate-90" 
                     : isHeroTransparent 
-                      ? "border-text/30 bg-transparent text-text" 
+                      ? "border-white/30 bg-transparent text-white" 
                       : "border-text/20 bg-transparent text-text"
                 )}
                 aria-label="Toggle Menu"

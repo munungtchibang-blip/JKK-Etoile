@@ -36,10 +36,15 @@ export default function CurrencyConverter() {
             className="fixed bottom-24 left-6 z-50 w-72 bg-navy-800 border border-gold/30 shadow-2xl rounded-2xl overflow-hidden backdrop-blur-xl"
           >
             <div className="bg-navy p-4 flex items-center justify-between border-b border-white/10">
-              <h3 className="text-sm uppercase tracking-widest font-bold text-gold flex items-center gap-2">
-                <Calculator size={16} />
-                Convertisseur
-              </h3>
+              <div className="flex flex-col">
+                <h3 className="text-sm uppercase tracking-widest font-bold text-gold flex items-center gap-2">
+                  <Calculator size={16} />
+                  Convertisseur
+                </h3>
+                <div className="text-[10px] text-text/60 uppercase tracking-wider mt-1">
+                  Taux du Jour: <span className="font-bold text-gold">1 USD = {rate} FC</span>
+                </div>
+              </div>
               <button 
                 onClick={() => setIsOpen(false)}
                 className="text-text/60 hover:text-white transition-colors p-1"

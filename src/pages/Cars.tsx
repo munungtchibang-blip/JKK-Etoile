@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSiteConfig } from '../components/SiteContext';
 import { LazyImage } from '../components/LazyImage';
+import { useCart } from '../components/CartContext';
 
 const TRACKING_STEPS = [
   { step: 'Achat', icon: Package, date: '12 Mai 2024', status: 'completed', location: 'Dubai, EAU', detail: 'Véhicule sécurisé et documents préparés.' },
@@ -17,6 +18,7 @@ const TRACKING_STEPS = [
 export default function Cars() {
   const { config, updateConfig } = useSiteConfig();
   const CARS = config.cars || [];
+  const { cart, addToCart, cartCount, setIsCartOpen } = useCart();
   const [trackingStatus, setTrackingStatus] = useState<string | null>(null);
   const [isTrackingLoading, setIsTrackingLoading] = useState(false);
   const [expandedCar, setExpandedCar] = useState<number | null>(null);
@@ -31,30 +33,22 @@ export default function Cars() {
   const [quickViewCar, setQuickViewCar] = useState<number | null>(null);
   const [touchStart, setTouchStart] = useState(0);
   const [touchEnd, setTouchEnd] = useState(0);
-  
-  const [cart, setCart] = useState<any[]>(() => {
-    const saved = localStorage.getItem('jkk_cars_cart');
-    return saved ? JSON.parse(saved) : [];
-  });
-  
-  useEffect(() => {
-    localStorage.setItem('jkk_cars_cart', JSON.stringify(cart));
-  }, [cart]);
 
-  const [isCartOpen, setIsCartOpen] = useState(false);
   const [isAlertModalOpen, setIsAlertModalOpen] = useState(false);
   const [alertTargetCar, setAlertTargetCar] = useState<number | null>(null);
   const [alertType, setAlertType] = useState('email');
   const [alertContact, setAlertContact] = useState('');
   const [alertSuccess, setAlertSuccess] = useState(false);
   
-  const addToCart = (car: any) => {
-    setCart((prev) => {
-      const existing = prev.find((item) => item.id === car.id);
-      if (existing) return prev;
-      return [...prev, car];
+  const handleAddToCart = (car: any) => {
+    addToCart({
+      id: car.id,
+      quantity: 1,
+      type: 'car',
+      name: `${car.brand} ${car.model}`,
+      price: car.price,
+      image: car.image
     });
-    setIsCartOpen(true);
   };
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -484,7 +478,7 @@ export default function Cars() {
                       <Bell size={14} /> Alerte prix
                     </button>
                   </div>
-                  <button onClick={() => addToCart(car)} className="w-full bg-green-500/10 border border-green-500/50 text-green-400 px-2 py-2.5 text-[10px] sm:text-[11px] uppercase tracking-wider transition-colors hover:bg-green-500 hover:text-text text-center flex items-center justify-center gap-1.5 outline-none focus:ring-1 focus:ring-green-500 font-semibold mb-6">
+                  <button onClick={() => handleAddToCart(car)} className="w-full bg-green-500/10 border border-green-500/50 text-green-400 px-2 py-2.5 text-[10px] sm:text-[11px] uppercase tracking-wider transition-colors hover:bg-green-500 hover:text-text text-center flex items-center justify-center gap-1.5 outline-none focus:ring-1 focus:ring-green-500 font-semibold mb-6">
                     <Package size={14} /> Ajouter au Panier
                   </button>
                 </div>
@@ -800,81 +794,6 @@ export default function Cars() {
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {isCartOpen && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#334155]/70 backdrop-blur-md">
-            <div className="w-full max-w-lg max-h-[85vh] bg-navy border border-gold/20 rounded-xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-300 overflow-hidden">
-              <div className="p-6 border-b border-gold/10 flex items-center justify-between">
-                <h2 className="text-sm uppercase tracking-[2px] font-semibold text-gold">Mon Panier</h2>
-                <button onClick={() => setIsCartOpen(false)} className="text-text/70 hover:text-gold transition-colors">
-                  <X size={20} />
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
-                {cart.length === 0 ? (
-                  <div className="text-center py-20 text-text/50">
-                    <Package size={48} className="mx-auto mb-4 opacity-20 text-gold" />
-                    <p className="text-[11px] uppercase tracking-widest">Votre panier est vide</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {cart.map((car) => (
-                      <div key={car.id} className="flex gap-4 items-center bg-navy-800/50 border border-gold/10 p-2 rounded">
-                        <LazyImage src={car.image} alt={car.brand} className="w-20 h-20 object-cover rounded" />
-                        <div className="flex-1">
-                          <h4 className="font-semibold text-text text-sm mb-1">{car.brand} {car.model}</h4>
-                          <div className="text-gold text-xs font-light">{car.priceStr}</div>
-                        </div>
-                        <button
-                          onClick={() => setCart(cart.filter(item => item.id !== car.id))}
-                          className="p-2 text-red-400 hover:bg-red-400/10 rounded"
-                        >
-                          <X size={16} />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              {cart.length > 0 && (
-                <div className="p-6 border-t border-gold/10 bg-navy-800/50">
-                  <button 
-                    onClick={() => {
-                      const num = "243826636212";
-                      const itemsText = cart.map((c) => `- ${c.brand} ${c.model} (${c.priceStr})`).join("\\n");
-                      const message = `Bonjour, je souhaite passer commande pour les véhicules suivants:\\n\\n${itemsText}`;
-                      window.open(`https://wa.me/${num}?text=${encodeURIComponent(message)}`, '_blank');
-                      
-                      const clientName = localStorage.getItem('jkk_user_name') || "Client WhatsApp";
-                      const clientEmail = localStorage.getItem('jkk_user_email') || "";
-                      
-                      cart.forEach(car => {
-                        const newOrder = {
-                          id: `#CMD-${String((config.orders?.length ? Math.max(...config.orders.map(o => parseInt(o.id.replace(/\D/g, "") || "0"))) : 0) + 1).padStart(3, "0")}`,
-                          client: clientName,
-                          email: clientEmail,
-                          item: `Véhicule: ${car.brand} ${car.model}`,
-                          date: new Date().toLocaleDateString('fr-FR'),
-                          status: "En cours",
-                          statusColor: "text-amber-400 bg-amber-500/20 border-amber-500/40 font-semibold"
-                        };
-                        updateConfig({ orders: [newOrder, ...(config.orders || [])] });
-                      });
-                      
-                      setCart([]);
-                      setIsCartOpen(false);
-                    }}
-                    className="w-full bg-gold text-[#0f172a] font-semibold text-xs py-4 tracking-widest uppercase hover:bg-[#d4b069] transition-all active:scale-95"
-                  >
-                    Commander sur WhatsApp
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
-        )}
-      </AnimatePresence>
-
       {/* Alert Modal */}
       <AnimatePresence>
         {isAlertModalOpen && (
@@ -971,7 +890,7 @@ export default function Cars() {
         >
           <Package size={24} className="text-[#0f172a]" />
           <span className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white border-2 border-navy">
-            {cart.length}
+            {cartCount}
           </span>
         </button>
       )}

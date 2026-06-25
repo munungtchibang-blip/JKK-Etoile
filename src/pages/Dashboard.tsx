@@ -15,6 +15,7 @@ export default function Dashboard() {
   const [userPhone, setUserPhone] = useState(() => localStorage.getItem('jkk_user_phone') || '');
   const [userEmail, setUserEmail] = useState(() => localStorage.getItem('jkk_user_email') || '');
   const [userAddress, setUserAddress] = useState(() => localStorage.getItem('jkk_user_address') || '');
+  const [userAvatar, setUserAvatar] = useState(() => localStorage.getItem('jkk_user_avatar') || '');
   
   const [updateSuccess, setUpdateSuccess] = useState(false);
 
@@ -26,11 +27,14 @@ export default function Dashboard() {
           setUserName(user.displayName || "Utilisateur Google");
           setUserEmail(user.email || "");
           setUserPhone(user.phoneNumber || "");
+          if (user.photoURL) setUserAvatar(user.photoURL);
           localStorage.setItem('jkk_user_name', user.displayName || "Utilisateur Google");
           localStorage.setItem('jkk_user_email', user.email || "");
           localStorage.setItem('jkk_user_phone', user.phoneNumber || "");
+          if (user.photoURL) localStorage.setItem('jkk_user_avatar', user.photoURL);
           localStorage.setItem('jkk_is_logged_in', 'true');
           setIsLoggedIn(true);
+          window.dispatchEvent(new Event('shopCartUpdated'));
         }
       } catch (error) {
         console.error("Erreur avec la redirection", error);
@@ -47,6 +51,7 @@ export default function Dashboard() {
       await logout();
       localStorage.removeItem('jkk_is_logged_in');
       setIsLoggedIn(false);
+      window.dispatchEvent(new Event('shopCartUpdated'));
     } catch (e) {
       console.error(e);
     }
@@ -60,11 +65,14 @@ export default function Dashboard() {
         setUserName(user.displayName || "Utilisateur Google");
         setUserEmail(user.email || "");
         setUserPhone(user.phoneNumber || "");
+        if (user.photoURL) setUserAvatar(user.photoURL);
         localStorage.setItem('jkk_user_name', user.displayName || "Utilisateur Google");
         localStorage.setItem('jkk_user_email', user.email || "");
         localStorage.setItem('jkk_user_phone', user.phoneNumber || "");
+        if (user.photoURL) localStorage.setItem('jkk_user_avatar', user.photoURL);
         localStorage.setItem('jkk_is_logged_in', 'true');
         setIsLoggedIn(true);
+        window.dispatchEvent(new Event('shopCartUpdated'));
       }
     } catch (error: any) {
       console.error("Erreur de connexion", error);
@@ -367,6 +375,7 @@ export default function Dashboard() {
                   localStorage.setItem('jkk_user_phone', userPhone);
                   localStorage.setItem('jkk_user_email', userEmail);
                   localStorage.setItem('jkk_user_address', userAddress);
+                  localStorage.setItem('jkk_user_avatar', userAvatar);
                   setUpdateSuccess(true);
                   setTimeout(() => setUpdateSuccess(false), 3000);
                 }} className="space-y-6">
@@ -375,6 +384,35 @@ export default function Dashboard() {
                       Votre profil a été mis à jour avec succès.
                     </div>
                   )}
+                  <div className="flex flex-col gap-2 items-center mb-6">
+                    <div className="relative group">
+                      <div className="h-24 w-24 rounded-full overflow-hidden border-2 border-gold flex items-center justify-center bg-navy-800">
+                        {userAvatar ? (
+                          <img src={userAvatar} alt={userName} className="h-full w-full object-cover" />
+                        ) : (
+                          <User size={40} className="text-text/50" />
+                        )}
+                      </div>
+                      <label className="absolute inset-0 bg-black/60 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                        <span className="text-white text-[10px] uppercase tracking-widest font-semibold text-center leading-tight">Changer<br/>Photo</span>
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          className="hidden" 
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) {
+                              const reader = new FileReader();
+                              reader.onloadend = () => {
+                                setUserAvatar(reader.result as string);
+                              };
+                              reader.readAsDataURL(file);
+                            }
+                          }}
+                        />
+                      </label>
+                    </div>
+                  </div>
                   <div className="flex flex-col gap-2">
                     <label className="text-[10px] uppercase text-gold tracking-[1.5px]">Nom complet</label>
                     <input 

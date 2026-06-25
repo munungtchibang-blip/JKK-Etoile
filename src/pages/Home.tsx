@@ -165,6 +165,13 @@ function AutoScrollCarousel({ items, renderItem, speed = 1 }: { items: any[], re
 export default function Home() {
   const [selectedAnnouncement, setSelectedAnnouncement] = useState<any>(null);
   const [activeServiceCategory, setActiveServiceCategory] = useState<'all' | 'voyage' | 'import-export' | 'finance'>('all');
+  const [isLoading, setIsLoading] = useState(true);
+  
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 800);
+    return () => clearTimeout(timer);
+  }, []);
+
   const { scrollY } = useScroll();
   const y = useTransform(scrollY, [0, 1000], [0, 400]);
   const { config } = useSiteConfig();
@@ -251,21 +258,6 @@ export default function Home() {
             }}
           />
         </AnimatePresence>
-        
-        {/* Carousel indicators */}
-        <div className="absolute bottom-8 left-0 right-0 z-20 flex justify-center gap-3 pointer-events-none">
-          {heroImages.map((_, i) => (
-            <button
-              key={i}
-              onClick={(e) => {
-                e.stopPropagation();
-                setCurrentImageIndex(i);
-              }}
-              className={`h-2 rounded-full transition-all duration-300 pointer-events-auto ${i === currentImageIndex ? "w-8 bg-gold" : "w-2 bg-white/50 hover:bg-white/80"}`}
-              aria-label={`Aller à l'image ${i + 1}`}
-            />
-          ))}
-        </div>
         
         <div className="absolute inset-0 z-0 bg-black/40 pointer-events-none"></div>
         <div className="absolute inset-0 z-0 bg-gradient-to-b from-navy/50 via-transparent to-navy/10 pointer-events-none"></div>
@@ -367,8 +359,22 @@ export default function Home() {
           </motion.div>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <AnimatePresence>
-              {(config.services || []).filter(service => {
+            <AnimatePresence mode="wait">
+              {isLoading ? (
+                [...Array(4)].map((_, i) => (
+                  <motion.div 
+                    key={`skeleton-${i}`} 
+                    exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.15 } }}
+                    className="flex flex-col bg-navy-800/50 p-6 border border-gold-muted/20 rounded-2xl h-[380px] animate-pulse"
+                  >
+                    <div className="relative mb-4 h-40 bg-navy-800 rounded"></div>
+                    <div className="h-12 w-12 bg-navy-800 rounded-full mb-6 mx-auto -mt-10 relative z-20 border-4 border-navy"></div>
+                    <div className="h-4 w-3/4 bg-navy-800 rounded mb-4"></div>
+                    <div className="h-3 w-full bg-navy-800 rounded mb-2"></div>
+                    <div className="h-3 w-5/6 bg-navy-800 rounded mb-4"></div>
+                  </motion.div>
+                ))
+              ) : (config.services || []).filter(service => {
                 if (activeServiceCategory === 'all') return true;
                 const isVoyage = ['/flights', '/visas', '/hotel'].includes(service.link) || service.title.toLowerCase().includes('voyage') || service.title.toLowerCase().includes('visa') || service.title.toLowerCase().includes('bilre');
                 const isImportExport = ['/shop', '/cars', '/cargo'].includes(service.link) || service.title.toLowerCase().includes('import') || service.title.toLowerCase().includes('boutique') || service.title.toLowerCase().includes('cargo');
@@ -384,15 +390,17 @@ export default function Home() {
 
                 return (
                 <motion.div
+                  layoutId={`service-${service.id}`}
                   key={service.id}
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.3 }}
+                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                  whileInView={{ opacity: 1, scale: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-50px" }}
+                  exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.15 } }}
+                  transition={{ duration: 0.4, ease: 'easeOut' }}
                 >
                   <Link 
                     to={service.link}
-                    className="h-full group flex flex-col rounded-2xl bg-glass border border-gold-muted/30 overflow-hidden transition-all duration-300 hover:scale-[1.02] hover:shadow-[0_10px_40px_-15px_rgba(212,176,105,0.4)]"
+                    className="h-full group flex flex-col rounded-2xl bg-glass border border-gold-muted/30 overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] hover:scale-[1.04] hover:-translate-y-3 hover:shadow-[0_25px_50px_-12px_rgba(212,176,105,0.35)] hover:border-gold/60"
                   >
                     {displayImage && (
                       <div className="relative h-48 w-full overflow-hidden flex-shrink-0 bg-navy-800">
@@ -439,12 +447,33 @@ export default function Home() {
             <h2 className="text-3xl font-light text-text sm:text-4xl">Actualités & Perspectives</h2>
           </motion.div>
           
-          <AutoScrollCarousel 
-            items={displayNews}
-            speed={0.5}
-            renderItem={(article, idx) => (
-              <div
-                className="w-[280px] md:w-[400px] h-[400px] md:h-[450px] shrink-0 group flex flex-col border border-gold-muted/30 bg-glass overflow-hidden transition-all duration-300 hover:shadow-2xl hover:shadow-gold/10 rounded-2xl"
+          {isLoading ? (
+            <div className="flex gap-6 overflow-hidden">
+              {[...Array(3)].map((_, i) => (
+                <div key={`news-skel-${i}`} className="w-[280px] md:w-[400px] h-[400px] md:h-[450px] shrink-0 flex flex-col border border-gold-muted/20 bg-navy-800/50 rounded-2xl animate-pulse">
+                  <div className="h-40 md:h-48 bg-navy-800 w-full rounded-t-2xl"></div>
+                  <div className="p-6 md:p-8 flex flex-col flex-grow">
+                    <div className="h-4 w-24 bg-navy-800 rounded mb-4"></div>
+                    <div className="h-6 w-3/4 bg-navy-800 rounded mb-4"></div>
+                    <div className="h-4 w-full bg-navy-800 rounded mb-2"></div>
+                    <div className="h-4 w-5/6 bg-navy-800 rounded mb-6"></div>
+                    <div className="h-4 w-20 bg-navy-800 rounded mt-auto"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <AutoScrollCarousel 
+              items={displayNews}
+              speed={0.5}
+              renderItem={(article, idx) => (
+              <motion.div
+                layoutId={`news-${idx}`}
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.4, ease: 'easeOut' }}
+                className="w-[280px] md:w-[400px] h-[400px] md:h-[450px] shrink-0 group flex flex-col border border-gold-muted/30 bg-glass overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] hover:scale-[1.03] hover:-translate-y-3 hover:shadow-[0_30px_60px_-15px_rgba(212,176,105,0.3)] hover:border-gold/60 rounded-2xl"
               >
                 <div className="h-40 md:h-48 overflow-hidden relative">
                   <div className="absolute inset-0 bg-navy/20 group-hover:bg-transparent transition-colors duration-500 z-10 pointer-events-none" />
@@ -465,9 +494,10 @@ export default function Home() {
                     Lire la suite <ArrowRight size={14} className="ml-2 transition-transform group-hover:translate-x-1" />
                   </button>
                 </div>
-              </div>
+              </motion.div>
             )}
           />
+          )}
         </div>
       </motion.section>
 
@@ -489,8 +519,13 @@ export default function Home() {
             items={displayTestimonials}
             speed={-0.5}
             renderItem={(testimonial, idx) => (
-              <div
-                className="w-[280px] md:w-[400px] h-[320px] md:h-[350px] shrink-0 rounded-2xl border border-gold-muted/30 bg-glass p-8 relative overflow-hidden transition-all duration-300 cursor-default hover:shadow-xl hover:border-gold-muted/50"
+              <motion.div
+                layoutId={`testimonial-${idx}`}
+                initial={{ opacity: 0, x: 30, scale: 0.95 }}
+                whileInView={{ opacity: 1, x: 0, scale: 1 }}
+                viewport={{ once: true, margin: "-50px" }}
+                transition={{ duration: 0.4, ease: 'easeOut' }}
+                className="w-[280px] md:w-[400px] h-[320px] md:h-[350px] shrink-0 rounded-2xl border border-gold-muted/30 bg-glass p-8 relative overflow-hidden transition-all duration-500 ease-[cubic-bezier(0.25,1,0.5,1)] cursor-default hover:scale-[1.03] hover:-translate-y-3 hover:shadow-[0_25px_50px_-12px_rgba(212,176,105,0.25)] hover:border-gold-muted/50"
               >
                 <div className="absolute top-0 right-0 p-6 text-gold/10 font-display text-8xl leading-none italic select-none">"</div>
                 <div className="relative z-10 font-sans flex flex-col h-full">
@@ -510,7 +545,7 @@ export default function Home() {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             )}
           />
         </div>

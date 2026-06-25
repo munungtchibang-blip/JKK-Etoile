@@ -6,6 +6,20 @@ import CurrencyConverter from './CurrencyConverter';
 import { motion, AnimatePresence } from 'motion/react';
 import { useEffect, Suspense } from 'react';
 import { useSiteConfig } from './SiteContext';
+import { CartProvider } from './CartContext';
+import CartDrawer from './CartDrawer';
+
+const pageVariants = {
+  initial: { opacity: 0, y: 20 },
+  in: { opacity: 1, y: 0 },
+  out: { opacity: 0, y: -20 }
+};
+
+const pageTransition = {
+  type: "tween",
+  ease: "anticipate",
+  duration: 0.4
+};
 
 export default function Layout() {
   const location = useLocation();
@@ -33,17 +47,32 @@ export default function Layout() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col bg-navy text-text">
-      <Navbar />
-      <main className="flex-grow w-full overflow-x-hidden relative">
-        <Suspense fallback={<div className="h-screen bg-navy" />}>
-           {currentOutlet}
-        </Suspense>
-      </main>
-      <Footer />
-      <FloatingWhatsApp />
-      <CurrencyConverter />
-    </div>
+    <CartProvider>
+      <div className="flex min-h-screen flex-col bg-navy text-text">
+        <Navbar />
+        <main className="flex-grow w-full overflow-x-hidden relative">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={location.pathname}
+              initial="initial"
+              animate="in"
+              exit="out"
+              variants={pageVariants}
+              transition={pageTransition}
+              className="flex-grow flex flex-col min-h-screen"
+            >
+              <Suspense fallback={<div className="h-screen bg-navy" />}>
+                 {currentOutlet}
+              </Suspense>
+            </motion.div>
+          </AnimatePresence>
+        </main>
+        <Footer />
+        <FloatingWhatsApp />
+        <CurrencyConverter />
+        <CartDrawer />
+      </div>
+    </CartProvider>
   );
 }
 

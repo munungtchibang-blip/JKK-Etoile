@@ -14,6 +14,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { Link } from "react-router-dom";
 import { useSiteConfig } from "../components/SiteContext";
 import { LazyImage } from "../components/LazyImage";
+import { useCart } from "../components/CartContext";
 
 import { useSearchParams } from "react-router-dom";
 
@@ -21,33 +22,27 @@ export default function Shop() {
   const { config, updateConfig } = useSiteConfig();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialSearch = searchParams.get('q') || "";
+  const { cart, addToCart, cartCount, setIsCartOpen } = useCart();
   
   const [filter, setFilter] = useState("all");
   const [sortPrice, setSortPrice] = useState<"asc" | "desc" | null>(null);
   const [minPrice, setMinPrice] = useState<number | "">("");
   const [maxPrice, setMaxPrice] = useState<number | "">("");
   const [searchQuery, setSearchQuery] = useState(initialSearch);
-  const [cart, setCart] = useState<{ id: number; quantity: number }[]>(() => {
-    const saved = localStorage.getItem('jkk_shop_cart');
-    return saved ? JSON.parse(saved) : [];
-  });
-  
-  useEffect(() => {
-    localStorage.setItem('jkk_shop_cart', JSON.stringify(cart));
-  }, [cart]);
-
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [checkoutStep, setCheckoutStep] = useState(0); // 0: cart, 1: payment, 2: success
   const [isLoading, setIsLoading] = useState(false);
-  const [isPageLoading, setIsPageLoading] = useState(false);
+  const [isPageLoading, setIsPageLoading] = useState(true);
+  const [quickViewProduct, setQuickViewProduct] = useState<any>(null);
 
   useEffect(() => {
-    // Artificial 800ms delay removed
+    if (searchParams.has('q')) {
+      setSearchQuery(searchParams.get('q') || "");
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsPageLoading(false), 800);
+    return () => clearTimeout(timer);
   }, []);
-
-  useEffect(() => {
-    // Removed 800ms delay for fluid filtering
-  }, [filter, sortPrice, minPrice, maxPrice, searchQuery]);
 
   let filteredProducts = filter === "all" ? [...(config.products || [])] : [];
   
@@ -89,38 +84,16 @@ export default function Shop() {
     filteredProducts.sort((a, b) => b.price - a.price);
   }
 
-  const addToCart = (id: number) => {
-    setCart((prev) => {
-      const existing = prev.find((item) => item.id === id);
-      if (existing)
-        return prev.map((item) =>
-          item.id === id ? { ...item, quantity: item.quantity + 1 } : item,
-        );
-      return [...prev, { id, quantity: 1 }];
+  const handleAddToCart = (product: any) => {
+    addToCart({
+      id: product.id,
+      quantity: 1,
+      type: 'shop',
+      name: product.name,
+      price: product.price,
+      image: product.image
     });
-    setIsCartOpen(true);
   };
-
-  const updateQuantity = (id: number, delta: number) => {
-    setCart((prev) =>
-      prev
-        .map((item) => {
-          if (item.id === id) {
-            const newQ = item.quantity + delta;
-            return newQ > 0 ? { ...item, quantity: newQ } : item;
-          }
-          return item;
-        })
-        .filter((item) => item.quantity > 0),
-    );
-  };
-
-  const total = cart.reduce((acc, item) => {
-    const p = config.products?.find((p) => p.id === item.id);
-    return acc + (p?.price || 0) * item.quantity;
-  }, 0);
-
-  const cartCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
   if (isPageLoading) {
     return (
@@ -367,11 +340,11 @@ export default function Shop() {
           key={isLoading ? "loading" : "loaded"}
           variants={{
             hidden: { opacity: 0 },
-            show: { opacity: 1, transition: { staggerChildren: 0.1 } },
+            show: { opacity: 1, transition: { staggerChildren: 0.05 } },
           }}
           initial="hidden"
           animate="show"
-          exit={{ opacity: 0, y: 20 }}
+          exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.15 } }}
           className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
         >
           {isLoading ? (
@@ -423,6 +396,18 @@ export default function Shop() {
                   alt={product.name}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
+                
+                <div className="absolute inset-0 bg-navy/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center pointer-events-none">
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setQuickViewProduct(product);
+                    }}
+                    className="pointer-events-auto flex items-center gap-2 bg-navy/90 backdrop-blur-sm border border-gold/50 text-gold px-4 py-2 text-[10px] uppercase tracking-widest font-semibold hover:bg-gold hover:text-navy transition-colors transform translate-y-4 group-hover:translate-y-0 duration-300"
+                  >
+                    Aperçu rapide
+                  </button>
+                </div>
               </div>
               <div className="mb-2 text-[10px] text-text/90 font-medium uppercase tracking-widest ">
                 {product.category}
@@ -438,7 +423,14 @@ export default function Shop() {
   onClick={(e) => {
     e.preventDefault();
     if (product.stockStatus !== "Rupture" && product.available !== false) {
-      addToCart(product.id);
+      addToCart({
+        id: product.id,
+        quantity: 1,
+        type: 'shop',
+        name: product.name,
+        price: product.price,
+        image: product.image
+      });
     }
   }}
   disabled={product.stockStatus === "Rupture" || product.available === false}
@@ -461,248 +453,11 @@ export default function Shop() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Cart Modal */}
-      {isCartOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#334155]/70 backdrop-blur-md dark-glass-text">
-          <div className="w-full max-w-lg max-h-[85vh] bg-navy-800 border border-gold-muted/30 rounded-xl shadow-2xl flex flex-col animate-in zoom-in-95 duration-300 overflow-hidden">
-            <div className="p-6 border-b border-gold-muted flex items-center justify-between">
-              <h2 className="text-[13px] uppercase tracking-[1px] font-semibold text-gold">
-                Mon Panier
-              </h2>
-              <button
-                onClick={() => {
-                  setIsCartOpen(false);
-                  setCheckoutStep(0);
-                }}
-                className="text-text hover:text-gold transition-colors p-1"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
-              {checkoutStep === 0 &&
-                (cart.length === 0 ? (
-                  <div className="text-center py-20 text-text/90 font-medium">
-                    <ShoppingCart
-                      size={48}
-                      className="mx-auto mb-4 opacity-20 text-gold"
-                    />
-                    <p className="text-[11px] uppercase tracking-widest">
-                      Votre panier est vide
-                    </p>
-                  </div>
-                ) : (
-                  <div className="space-y-6">
-                    {cart.map((item) => {
-                      const p = config.products?.find((p) => p.id === item.id);
-                      if (!p) return null;
-                      return (
-                        <div
-                          key={item.id}
-                          className="flex gap-4 items-center bg-glass border border-gold-muted p-2"
-                        >
-                          <LazyImage
-                            src={p.image}
-                            alt={p.name}
-                            className="w-20 h-20 object-cover bg-navy-800"
-                          />
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-text text-[11px] uppercase tracking-wider line-clamp-1 mb-1">
-                              {p.name}
-                            </h4>
-                            <div className="text-gold text-xs mb-2 font-light">
-                              {p.price}$
-                            </div>
-                            <div className="flex items-center gap-3">
-                              <button
-                                onClick={() => updateQuantity(item.id, -1)}
-                                className="w-6 h-6 border border-gold-muted flex items-center justify-center text-text hover:text-gold transition-colors"
-                              >
-                                <Minus size={12} />
-                              </button>
-                              <span className="text-[11px] font-medium w-4 text-center text-text">
-                                {item.quantity}
-                              </span>
-                              <button
-                                onClick={() => updateQuantity(item.id, 1)}
-                                className="w-6 h-6 border border-gold-muted flex items-center justify-center text-text hover:text-gold transition-colors"
-                              >
-                                <Plus size={12} />
-                              </button>
-                            </div>
-                          </div>
-                          <div className="font-light text-text text-sm pr-4">
-                            {p.price * item.quantity}$
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ))}
-
-              {checkoutStep === 1 && (
-                <div className="space-y-6">
-                  <h3 className="text-[13px] uppercase tracking-[1px] font-semibold text-gold mb-4">
-                    Paiement Mobile Money
-                  </h3>
-                  <div className="space-y-4">
-                    <button
-                      onClick={() => setCheckoutStep(2)}
-                      className="w-full flex items-center justify-between p-4 border border-gold-muted bg-glass hover:bg-white/5 transition-colors"
-                    >
-                      <div className="flex items-center gap-3 font-semibold text-text text-[11px] uppercase tracking-wider">
-                        <CreditCard size={18} className="text-gold" /> M-PESA
-                      </div>
-                      <span className="text-gold text-sm font-light">
-                        Payer {total}$
-                      </span>
-                    </button>
-                    <button
-                      onClick={() => setCheckoutStep(2)}
-                      className="w-full flex items-center justify-between p-4 border border-gold-muted bg-glass hover:bg-white/5 transition-colors"
-                    >
-                      <div className="flex items-center gap-3 font-semibold text-text text-[11px] uppercase tracking-wider">
-                        <CreditCard size={18} className="text-gold" /> Orange
-                        Money
-                      </div>
-                      <span className="text-gold text-sm font-light">
-                        Payer {total}$
-                      </span>
-                    </button>
-                    <button
-                      onClick={() => setCheckoutStep(2)}
-                      className="w-full flex items-center justify-between p-4 border border-gold-muted bg-glass hover:bg-white/5 transition-colors"
-                    >
-                      <div className="flex items-center gap-3 font-semibold text-text text-[11px] uppercase tracking-wider">
-                        <CreditCard size={18} className="text-gold" /> Airtel
-                        Money
-                      </div>
-                      <span className="text-gold text-sm font-light">
-                        Payer {total}$
-                      </span>
-                    </button>
-                  </div>
-                  <div className="mt-8 text-[10px] uppercase tracking-widest text-text/90 font-medium text-center  leading-relaxed">
-                    Taux de change appliqué à la validation. <br />
-                    L'équivalent en Francs Congolais (CDF) sera débité.
-                  </div>
-                </div>
-              )}
-
-              {checkoutStep === 2 && (
-                <div className="text-center py-10 mt-10">
-                  <div className="w-20 h-20 border border-gold text-gold rounded-full flex items-center justify-center mx-auto mb-6">
-                    <svg
-                      className="w-10 h-10"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={1}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  </div>
-                  <h3 className="text-xl font-light text-text mb-2">
-                    Paiement Réussi !
-                  </h3>
-                  <p className="text-text/90 font-medium text-[11px] uppercase tracking-wider mb-8 ">
-                    Votre commande a été confirmée.
-                  </p>
-                  <button
-                    onClick={() => {
-                      setCart([]);
-                      setIsCartOpen(false);
-                      setCheckoutStep(0);
-                    }}
-                    className="bg-gold text-[#0f172a] text-xs tracking-widest uppercase font-semibold px-8 py-3 transition-colors hover:bg-[#d4b069]"
-                  >
-                    Retour à la boutique
-                  </button>
-                </div>
-              )}
-            </div>
-
-            {checkoutStep === 0 && cart.length > 0 && (
-              <div className="p-6 border-t border-gold-muted bg-navy">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-[9px] uppercase tracking-wider text-text/90 font-medium">
-                    Sous-total
-                  </span>
-                  <span className="text-sm font-light text-text">{total}$</span>
-                </div>
-                <div className="flex justify-between items-center mb-6 pb-4 border-b border-white/5">
-                  <span className="text-[11px] uppercase tracking-wider text-text/90 font-medium">
-                    Total à payer
-                  </span>
-                  <span className="text-2xl font-light text-gold">
-                    {total}$
-                  </span>
-                </div>
-                <div className="flex flex-col gap-3">
-                  <button
-                    onClick={() => {
-                      const clientName = localStorage.getItem('jkk_user_name') || "Client WhatsApp";
-                      const clientEmail = localStorage.getItem('jkk_user_email') || "";
-                      
-                      const newOrder = {
-                        id: `#CMD-${String((config.orders?.length ? Math.max(...config.orders.map(o => parseInt(o.id.replace(/\D/g, "") || "0"))) : 0) + 1).padStart(3, "0")}`,
-                        client: clientName,
-                        item: cart.map(item => {
-                          const p = config.products?.find((p) => p.id === item.id);
-                          return p ? `${item.quantity}x ${p.name}` : '';
-                        }).filter(Boolean).join(', '),
-                        date: new Date().toLocaleDateString('fr-FR'),
-                        status: "En cours",
-                        statusColor: "text-amber-400 bg-amber-500/20 border-amber-500/40 font-semibold"
-                      };
-                      
-                      updateConfig({ orders: [newOrder, ...(config.orders || [])] });
-
-                      const itemsText = cart
-                        .map((item) => {
-                          const p = config.products?.find((p) => p.id === item.id);
-                          if (!p) return '';
-                          const imageUrl = new URL(p.image, window.location.origin).href;
-                          return `${item.quantity}x ${p.name} (${p.price}$)\n  Image : ${imageUrl}`;
-                        })
-                        .join("\n\n");
-                      const message = `Bonjour, je souhaite passer commande pour les articles suivants:\n\n${itemsText}\n\nTotal: ${total}$`;
-                      const num = "243826636212";
-                      window.open(
-                        `https://wa.me/${num}?text=${encodeURIComponent(message)}`,
-                        "_blank",
-                      );
-                      setCart([]); // Clear cart after order
-                      setCheckoutStep(0);
-                    }}
-                    className="w-full bg-gold text-[#0f172a] font-semibold text-xs py-4 tracking-widest uppercase hover:bg-[#d4b069] transition-all focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-navy active:scale-95"
-                  >
-                    Commander sur WhatsApp
-                  </button>
-                  <button
-                    onClick={() => setCart([])}
-                    className="w-full flex items-center justify-center gap-2 border border-text/10 text-text/90 font-medium text-[10px] py-3 tracking-widest uppercase hover:bg-white/5 hover:text-text transition-colors focus:outline-none focus:ring-1 focus:ring-white/20"
-                  >
-                    <Trash2 size={14} /> Vider le panier
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Floating Cart Button */}
-      {cartCount > 0 && (
+      {/* Cart Modal has been migrated to global CartDrawer in Layout */}
+      {cart.length > 0 && (
         <button
           onClick={() => setIsCartOpen(true)}
-          className="fixed bottom-[100px] right-6 z-50 flex items-center justify-center p-4 bg-gold rounded-full shadow-lg hover:bg-[#d4b069] transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-gold focus:ring-offset-2 focus:ring-offset-navy shadow-[0_4px_20px_rgba(212,176,105,0.3)]"
-          aria-label="Ouvrir le panier"
+          className="fixed bottom-[100px] right-6 z-[90] flex items-center justify-center p-4 bg-gold rounded-full shadow-[0_4px_20px_rgba(212,176,105,0.3)] hover:bg-[#d4b069] transition-transform hover:scale-105"
         >
           <ShoppingCart size={24} className="text-[#0f172a]" />
           <span className="absolute -top-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white border-2 border-navy">
@@ -710,6 +465,102 @@ export default function Shop() {
           </span>
         </button>
       )}
+
+      {/* Quick View Modal */}
+      <AnimatePresence>
+        {quickViewProduct && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, transition: { duration: 0.2 } }}
+              className="absolute inset-0 bg-navy/80 backdrop-blur-sm"
+              onClick={() => setQuickViewProduct(null)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20, transition: { duration: 0.2 } }}
+              className="relative w-full max-w-4xl bg-navy-800 border border-gold-muted/30 rounded-2xl shadow-2xl overflow-hidden flex flex-col md:flex-row z-10"
+            >
+              <button
+                onClick={() => setQuickViewProduct(null)}
+                className="absolute top-4 right-4 z-20 p-2 bg-navy/50 backdrop-blur-sm text-text/60 hover:text-white rounded-full transition-colors"
+              >
+                <X size={20} />
+              </button>
+              
+              <div className="md:w-1/2 aspect-square md:aspect-auto bg-navy-900 relative">
+                <img
+                  src={quickViewProduct.image}
+                  alt={quickViewProduct.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              
+              <div className="md:w-1/2 p-6 md:p-10 flex flex-col">
+                <div className="mb-2 text-[10px] text-text/60 font-medium uppercase tracking-widest">
+                  {quickViewProduct.category}
+                </div>
+                <h2 className="text-2xl font-semibold text-text mb-4">
+                  {quickViewProduct.name}
+                </h2>
+                <div className="text-3xl font-light text-gold mb-6">
+                  {quickViewProduct.price}$
+                </div>
+                
+                <div className="text-sm text-text/80 mb-8 whitespace-pre-wrap leading-relaxed flex-grow">
+                  {quickViewProduct.description || "Aucune description détaillée disponible pour ce produit."}
+                </div>
+                
+                <div className="flex items-center gap-4 mt-auto">
+                  <button
+                    onClick={() => {
+                      if (quickViewProduct.stockStatus !== "Rupture" && quickViewProduct.available !== false) {
+                        addToCart({
+                          id: quickViewProduct.id,
+                          quantity: 1,
+                          type: 'shop',
+                          name: quickViewProduct.name,
+                          price: quickViewProduct.price,
+                          image: quickViewProduct.image
+                        });
+                        setQuickViewProduct(null);
+                        setIsCartOpen(true);
+                      }
+                    }}
+                    disabled={quickViewProduct.stockStatus === "Rupture" || quickViewProduct.available === false}
+                    className={`flex-1 flex items-center justify-center gap-2 py-4 px-6 text-xs tracking-widest uppercase font-semibold transition-colors ${
+                      quickViewProduct.stockStatus === "Rupture" || quickViewProduct.available === false
+                        ? "bg-navy-800 text-text/30 cursor-not-allowed border border-text/10"
+                        : "bg-gold text-[#0f172a] hover:bg-[#d4b069]"
+                    }`}
+                  >
+                    {quickViewProduct.stockStatus === "Rupture" || quickViewProduct.available === false ? (
+                      "En Rupture"
+                    ) : quickViewProduct.stockStatus === "Arrivage" ? (
+                      "Précommander"
+                    ) : (
+                      <>
+                        <ShoppingCart size={16} />
+                        Ajouter au panier
+                      </>
+                    )}
+                  </button>
+                  <Link
+                    to={`/shop/${quickViewProduct.id}`}
+                    onClick={() => setQuickViewProduct(null)}
+                    className="flex items-center justify-center p-4 border border-gold/30 text-gold hover:bg-gold/10 transition-colors"
+                    title="Voir les détails complets"
+                  >
+                    <Plus size={16} />
+                  </Link>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
       </div>
 </div>
   );
